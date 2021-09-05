@@ -13,4 +13,14 @@ const mongoUploadAuditFile = async (_, body) => {
         });
 };
 
+export const mongoGetUploadFiles = async (_, params) => {
+    return await fetch('http://localhost:8080/api/fileUpload', {
+        method: "GET",
+    }).then(res => res.json())
+        .then(json => {
+            // console.log('RESPONSE: ', json);
+            return json;
+        })
+}
+
 export default mongoUploadAuditFile;

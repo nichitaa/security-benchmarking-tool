@@ -1,3 +1,5 @@
+import {mongoGetUploadFiles} from '@src/electron/services/mongoapi';
+
 export {};
 
 // TODO: definition for ipc / api
@@ -7,7 +9,8 @@ interface InotificationApi {
 
 interface IdbApi {
     getProducts: () => any,
-    mongoUploadAuditFile: (body: object) => any
+    mongoUploadAuditFile: (body: object) => any,
+    mongoGetUploadFiles: () => any,
 }
 
 declare global {

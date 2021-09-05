@@ -9,6 +9,9 @@ const dbApi = {
     mongoUploadAuditFile: async (body) => {
         return await ipcRenderer.invoke('mongoUploadAuditFile', body);
     },
+    mongoGetUploadFiles: async () => {
+        return await ipcRenderer.invoke('mongoGetUploadFiles')
+    }
 };
 
 const notificationApi = {
