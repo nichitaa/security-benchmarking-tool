@@ -1,8 +1,8 @@
-export {}
+export {};
 
 // TODO: definition for ipc / api
 interface InotificationApi {
-    sendNotification: (message: string) => void
+    sendNotification: (message: string) => void;
 }
 
 interface IdbApi {
@@ -12,9 +12,9 @@ interface IdbApi {
 
 declare global {
     interface Window {
-        "electron": {
+        'electron': {
             notificationApi: InotificationApi,
             dbApi: IdbApi
-        }
+        };
     }
 }

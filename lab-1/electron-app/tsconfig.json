@@ -13,11 +13,22 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "paths": {
-      "*": ["node_modules/*"],
-      "@assets/*": ["./assets/*"],
-      "@src/*": ["./src/*"]
+      "*": [
+        "node_modules/*"
+      ],
+      "@assets/*": [
+        "./assets/*"
+      ],
+      "@src/*": [
+        "./src/*"
+      ]
     }
   },
-  "exclude": ["node_modules"],
-  "include": ["src/**/*", "tools/**/*"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src/**/*",
+    "tools/**/*"
+  ]
 }

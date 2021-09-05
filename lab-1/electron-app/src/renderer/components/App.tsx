@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
 import {hot} from 'react-hot-loader';
 import {Divider, Input, Table, Typography, Button} from 'antd';
+
 const {Title} = Typography;
-import {UploadFile} from './app-components/UploadFile'
+import {UploadFile} from './app-components/UploadFile';
 
 import './App.less';
 

@@ -8,7 +8,7 @@ const mongoUploadAuditFile = async (_, body) => {
     })
         .then(res => res.json())
         .then(json => {
-            console.log("RESPONSE: ", json);
+            console.log('RESPONSE: ', json);
             return json;
         });
 };

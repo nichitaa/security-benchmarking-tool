@@ -8,12 +8,12 @@ const dbApi = {
     },
     mongoUploadAuditFile: async (body) => {
         return await ipcRenderer.invoke('mongoUploadAuditFile', body);
-    }
+    },
 };
 
 const notificationApi = {
     sendNotification: async (message: string) => {
-        return await ipcRenderer.invoke('notify', message)
+        return await ipcRenderer.invoke('notify', message);
     },
 };
 

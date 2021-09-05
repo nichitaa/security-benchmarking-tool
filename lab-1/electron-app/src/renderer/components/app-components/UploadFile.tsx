@@ -18,7 +18,7 @@ export const UploadFile = () => {
             'fileName': file.name,
         };
         const res = await window.electron.dbApi.mongoUploadAuditFile(body);
-        console.log("FILE UPLOAD RESPONSE: ", res)
+        console.log('FILE UPLOAD RESPONSE: ', res);
         if (res.isSuccess) {
             onSuccess('ok');
         } else {

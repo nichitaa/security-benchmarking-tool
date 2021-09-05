@@ -1,5 +1,5 @@
-const Connection = require("tedious").Connection
-const Request = require("tedious").Request
+const Connection = require('tedious').Connection;
+const Request = require('tedious').Request;
 
 // MSQL Server Connection / API
 
@@ -25,72 +25,72 @@ const connectToServer = () => {
                 // See 'doneInProc' event below
                 rowCollectionOnDone: true
             }
-        }
+        };
 
-        let connection = new Connection(config)
+        let connection = new Connection(config);
 
-        connection.connect()
+        connection.connect();
 
         connection.on('connect', function (err) {
             if (err) {
-                console.log('Error: ', err)
-                reject(err)
+                console.log('Error: ', err);
+                reject(err);
             } else {
                 // If no error, then good to go...
-                console.log('Connection Successful!')
-                resolve(connection)
+                console.log('Connection Successful!');
+                resolve(connection);
             }
-        })
+        });
 
-        connection.on('end', () => { console.log("Connection Closed!") })
-    })
-}
+        connection.on('end', () => { console.log('Connection Closed!'); });
+    });
+};
 
 const readFromDb = (connection, sqlQuery) => {
     return new Promise((resolve, reject) => {
-        let products = []
+        let products = [];
 
-        console.log('Reading rows from the Table...')
+        console.log('Reading rows from the Table...');
 
         // Read all rows from table
         let request = new Request(sqlQuery, (err, rowCount, rows) => {
             if (err) {
-                reject(err)
+                reject(err);
             } else {
-                console.log(rowCount + ' row(s) returned')
-                resolve(products)
-                connection.close()
+                console.log(rowCount + ' row(s) returned');
+                resolve(products);
+                connection.close();
             }
-        })
+        });
 
         request.on('doneInProc', (rowCount, more, rows) => {
-            products = []
+            products = [];
             rows.map(row => {
-                let result = {}
+                let result = {};
                 row.map(child => {
-                    result[child.metadata.colName] = child.value
-                })
-                products.push(result)
-            })
-        })
+                    result[child.metadata.colName] = child.value;
+                });
+                products.push(result);
+            });
+        });
 
         // Execute SQL statement
-        connection.execSql(request)
-    })
-}
+        connection.execSql(request);
+    });
+};
 
 const getProducts = () => {
     return new Promise((resolve, reject) => {
         connectToServer()
             .then(connection => {
-                let sqlStr = 'SELECT TOP(2) [Name], [ProductNumber] FROM Production.Product'
+                let sqlStr = 'SELECT TOP(2) [Name], [ProductNumber] FROM Production.Product';
 
-                return readFromDb(connection, sqlStr)
+                return readFromDb(connection, sqlStr);
             })
             .then(products => resolve(products))
-            .catch(err => reject(err))
-    })
-}
+            .catch(err => reject(err));
+    });
+};
 
 export default getProducts;
 
