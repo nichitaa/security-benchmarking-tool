@@ -28,4 +28,12 @@ router.post('/', async (req, res, next) => {
 
 });
 
+router.get('/', async (req, res, next) => {
+    const data = await AuditUpload.find({})
+    res.send({
+        isSuccess: true,
+        data: data
+    })
+})
+
 module.exports = router;

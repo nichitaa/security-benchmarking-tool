@@ -88,6 +88,7 @@ const UploadFile = () => {
 
     return (
         <div style={{
+
             overflow: 'hidden',
             textOverflow: 'ellipsis'
         }}>
