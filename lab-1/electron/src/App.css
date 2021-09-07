@@ -1,0 +1,12 @@
+.App {
+    margin: 50px auto 30px auto;
+    padding: 10px;
+    width: 70vw;
+    /*height: 60vh;*/
+    border: 2px solid rgba(0, 0, 0, 0.4);
+    border-radius: 7px;
+}
+
+.ant-upload.ant-upload-select {
+    width: 100%;
+}

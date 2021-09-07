@@ -1,0 +1,54 @@
+{
+  "name": "electron",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "antd": "^4.16.13",
+    "axios": "^0.21.4",
+    "cross-env": "^7.0.3",
+    "form-data": "^4.0.0",
+    "js-file-download": "^0.4.12",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "request": "^2.88.2",
+    "web-vitals": "^1.0.1"
+  },
+  "main": "public/electron.js",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "dev": "concurrently -k \"cross-env BROWSER=none yarn start\" \"yarn:electron\"",
+    "electron": "wait-on tcp:3000 && electron ."
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@ant-design/icons": "^4.6.4",
+    "concurrently": "^6.2.1",
+    "electron": "^14.0.0",
+    "electron-is-dev": "^2.0.0",
+    "wait-on": "^6.0.0"
+  }
+}

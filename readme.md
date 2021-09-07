@@ -12,8 +12,6 @@ Desktop app made with:
 
 - Electron 
 - React ( UI library - antd)
-- TypeScript
-- Electron-Forge / Webpack
 - Express
 - MongoDB (mongoose odm)
 
@@ -21,11 +19,11 @@ Desktop app made with:
 
 `1. clone rep (git clone)`
 
-`2. cd lab1\electron-app and run yarn install (or use npm install)`
+`2. cd lab1\electron and run yarn install (or use npm install)`
 
 `3. cd lab1\express-api and run yarn install`
 
-`4. create .env file in folder lab1\express-api`
+`4. create .env file in folder lab1\express-api && new uploads folder (optionaly)` 
 
 `5. create new mongodb cluster and add new database (cs-faf)  `
 
@@ -33,7 +31,7 @@ Desktop app made with:
 
 `6. cd lab1\express-api and run yarn dev (will start a dev server on 8080)`
 
-`7. cd lab1\electron-app and run yarn start (electron-forge will start the electron application in dev mode)`
+`7. cd lab1\electron and run yarn dev`
 
 
 

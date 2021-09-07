@@ -1,13 +1,15 @@
 .idea
-
 lab-1/.idea
-
 lab-1/express-api/.idea
+lab-1/electron/.idea
+
 lab-1/express-api/node_modules
 lab-1/express-api/.env
+lab-1/express-api/uploads/*
+lab-1/express-api/yarn-debug.log*
+lab-1/express-api/yarn-error.log*
 
-lab-1/electron-app/.idea
-lab-1/electron-app/out
-lab-1/electron-app/make
-lab-1/electron-app/.webpack
-lab-1/electron-app/node_modules
+lab-1/electron/node_modules
+lab-1/electron/build
+lab-1/electron/yarn-debug.log*
+lab-1/electron/yarn-error.log*
