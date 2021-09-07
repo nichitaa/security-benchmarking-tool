@@ -1,7 +1,17 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import api from './services/api';
-import { Button, Upload, Typography, notification, Divider, List, Popover } from 'antd';
+import {
+    message,
+    Button,
+    Upload,
+    Typography,
+    notification,
+    Divider,
+    List,
+    Popover,
+    Popconfirm
+} from 'antd';
 import fileDownload from 'js-file-download';
 import { DeleteOutlined } from '@ant-design/icons';
 
@@ -50,7 +60,7 @@ const App = () => {
                 .catch(err => err);
             console.log('uploaded file: ', res);
             if (res.isSuccess) {
-                openNotification('success', 'File uploaded', 'The file was successfully uploaded');
+                message.success('File uploaded successfully!', 2);
                 fetchFiles().then(res => {
                     onSuccess('ok');
                 });
@@ -77,7 +87,7 @@ const App = () => {
         console.log('delete res: ', res);
         const isSuccess = res.data.isSuccess;
         if (isSuccess) {
-            openNotification('success', 'File deleted', 'The file: ' + filename + ' was successfully deleted!');
+            message.success('File deleted successfully!', 2);
             fetchFiles();
         } else {
             openNotification('error', 'Error', 'The file: ' + filename + ' was not deleted :(');
@@ -87,8 +97,8 @@ const App = () => {
     return (
         <div className="App">
             <Title
-                style={{ textAlign: 'center', color: 'rgba(0, 0, 0, 0.6)' }}
-                level={4}>CS - upload audit files</Title>
+                style={{ textAlign: 'center', color: '#555b6e' }}
+                level={4}> CS - Audit files</Title>
             <Divider/>
             <Upload
                 style={{
@@ -96,31 +106,48 @@ const App = () => {
                 }}
                 fileList={[]}
                 customRequest={handleFileUpload}>
-                <Button style={{ width: '100%' }}>Upload</Button>
+                <Button
+                    type={'primary'}
+                    style={{ width: '100%' }}>Upload</Button>
             </Upload>
 
             <Divider/>
-            {/*<Button*/}
-            {/*    style={{ width: '100%' }}*/}
-            {/*    onClick={fetchFiles}>Refresh</Button>*/}
-            {/*<Divider/>*/}
             <List
                 style={{
                     overflow: 'hidden'
                 }}
                 loading={loading}
                 size="small"
-                header={<p>Archive:</p>}
+                header={<p style={{ marginBottom: 0 }}>Archive:</p>}
                 bordered
                 dataSource={files}
                 renderItem={item => <List.Item
-                    style={{ cursor: 'pointer', display: 'flex' }}>
-                    <p onClick={() => handleFileDownload(item.fileName)}>{item.fileName}</p> <Button
-                    onClick={() => {
-                        deleteFile(item.fileName);
-                    }}
-                    danger
-                    size={'small'}><DeleteOutlined/></Button>
+                    style={{ display: 'flex' }}>
+                    <Popconfirm
+                        onConfirm={() => {handleFileDownload(item.fileName);}}
+                        okText="Download"
+                        cancelText="Cancel"
+                    >
+                        <p
+                            style={{
+                                cursor: 'pointer',
+                                width: '90%',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                marginBottom: 0
+                            }}>{item.fileName}</p>
+                    </Popconfirm>
+
+                    <Popconfirm
+                        onConfirm={() => {deleteFile(item.fileName);}}
+                        onCancel={() => message.info(`You're right!`, 0.7)}
+                        okText="Delete"
+                        cancelText="Cancel"
+                    >
+                        <DeleteOutlined style={{ color: 'red' }}/>
+                    </Popconfirm>
+
+
                 </List.Item>}
             />
         </div>

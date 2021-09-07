@@ -15,23 +15,31 @@ Desktop app made with:
 - Express (multer for file storage)
 - MongoDB (mongoose odm)
 
-`to run application localy:`
+##### To run this project
 
-`1. clone rep (git clone)`
+```bash
+create new folder where to clone the project && and open it with cmd
 
-`2. cd lab1\electron and run yarn install (or use npm install)`
+$ git clone .
+$ cd lab-1\electron 
+$ yarn install ( or npm i )
 
-`3. cd lab1\express-api and run yarn install`
+$ cd lab-1\express-api
+$ yarn install ( or npm i )
 
-`4. create .env file in folder lab1\express-api && new uploads folder (optionaly)` 
+create .env file
+$ cd lab-1\express-api
+$ echo MONGODB_UR > .env
+add MONGODB connection string to .env file
+(ex: MONGODB_URL=mongodb+srv://<YOUR_DB_USER>:<USER_PASSWORD>@cluster0.ccfyk.mongodb.net/cs-faf?retryWrites=true&w=majority)
 
-`5. create new mongodb cluster and add new database (cs-faf)  `
+run application
+$ cd lab-1\express-api
+$ yarn dev ( or npm run dev )
 
-`5. create new env variable in .env file (mongodb connection string): MONGODB_URL=mongodb+srv://<YOUR_DB_USER>:<USER_PASSWORD>@cluster0.ccfyk.mongodb.net/cs-faf?retryWrites=true&w=majority`
-
-`6. cd lab1\express-api and run yarn dev (will start a dev server on 8080)`
-
-`7. cd lab1\electron and run yarn dev`
+$ cd lab-1\electron
+$ yarn dev ( or npm run dev )
+```
 
 
 
