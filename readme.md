@@ -12,7 +12,7 @@ Desktop app made with:
 
 - Electron 
 - React ( UI library - antd)
-- Express
+- Express (multer for file storage)
 - MongoDB (mongoose odm)
 
 `to run application localy:`
