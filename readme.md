@@ -11,7 +11,7 @@
 Desktop app made with:
 
 - Electron 
-- React ( UI library - antd)
+- React - TS ( UI library - antd)
 - Express (multer for file storage)
 - MongoDB (mongoose odm)
 
@@ -21,7 +21,7 @@ Desktop app made with:
 create new folder where to clone the project && and open it with cmd
 
 $ git clone .
-$ cd lab-1\electron 
+$ cd lab-1\electron-ts 
 $ yarn install ( or npm i )
 
 $ cd lab-1\express-api
@@ -37,7 +37,7 @@ run application
 $ cd lab-1\express-api
 $ yarn dev ( or npm run dev )
 
-$ cd lab-1\electron
+$ cd lab-1\electron-ts
 $ yarn dev ( or npm run dev )
 ```
 

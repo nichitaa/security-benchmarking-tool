@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {useEffect, useState} from 'react';
 import './App.css';
 import api from './services/api';
 import {
@@ -9,19 +9,23 @@ import {
     notification,
     Divider,
     List,
-    Popover,
     Popconfirm
 } from 'antd';
 import fileDownload from 'js-file-download';
-import { DeleteOutlined } from '@ant-design/icons';
+import {DeleteOutlined} from '@ant-design/icons';
 
 
-const { Title } = Typography;
+const {Title} = Typography;
 
 
 const App = () => {
 
-    const [files, setFiles] = useState([]);
+    type File = {
+        fileName: string,
+        auditFile: object
+    };
+
+    const [files, setFiles] = useState<File[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -44,7 +48,7 @@ const App = () => {
         });
     };
 
-    const handleFileUpload = async ({ file, onSuccess, onError }) => {
+    const handleFileUpload = async ({file, onSuccess, onError}) => {
         const resExists = await api.get('/exists/' + file.name);
         const exists = resExists.data.exists;
         console.log('exists: ', exists);
@@ -97,7 +101,7 @@ const App = () => {
     return (
         <div className="App">
             <Title
-                style={{ textAlign: 'center', color: '#555b6e' }}
+                style={{textAlign: 'center', color: '#555b6e'}}
                 level={4}> CS - Audit files</Title>
             <Divider/>
             <Upload
@@ -105,26 +109,28 @@ const App = () => {
                     width: '100%'
                 }}
                 fileList={[]}
+                // @ts-ignore
                 customRequest={handleFileUpload}>
                 <Button
                     type={'primary'}
-                    style={{ width: '100%' }}>Upload</Button>
+                    style={{width: '100%'}}>Upload</Button>
             </Upload>
 
             <Divider/>
             <List
-                style={{
-                    overflow: 'hidden'
-                }}
+                style={{overflow: 'hidden'}}
                 loading={loading}
                 size="small"
-                header={<p style={{ marginBottom: 0 }}>Archive:</p>}
+                header={<p style={{marginBottom: 0}}>Archive:</p>}
                 bordered
                 dataSource={files}
                 renderItem={item => <List.Item
-                    style={{ display: 'flex' }}>
+                    style={{display: 'flex'}}>
                     <Popconfirm
-                        onConfirm={() => {handleFileDownload(item.fileName);}}
+                        title={''}
+                        onConfirm={() => {
+                            handleFileDownload(item.fileName);
+                        }}
                         okText="Download"
                         cancelText="Cancel"
                     >
@@ -139,12 +145,15 @@ const App = () => {
                     </Popconfirm>
 
                     <Popconfirm
-                        onConfirm={() => {deleteFile(item.fileName);}}
+                        title={''}
+                        onConfirm={() => {
+                            deleteFile(item.fileName);
+                        }}
                         onCancel={() => message.info(`You're right!`, 0.7)}
                         okText="Delete"
                         cancelText="Cancel"
                     >
-                        <DeleteOutlined style={{ color: 'red' }}/>
+                        <DeleteOutlined style={{color: 'red'}}/>
                     </Popconfirm>
 
 

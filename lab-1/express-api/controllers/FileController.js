@@ -12,6 +12,8 @@ class FileController {
                 contentType: 'audit'
             }
         };
+        // parse file content (xml - like text)
+
         AuditUpload.create(obj, (err, item) => {
             if (err) {
                 console.log('error: ', err);
