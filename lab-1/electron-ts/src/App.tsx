@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import ReactJson from 'react-json-view'
 import './App.css';
 import api from './services/api';
 import {
@@ -9,7 +10,8 @@ import {
     notification,
     Divider,
     List,
-    Popconfirm
+    Popconfirm,
+    Modal
 } from 'antd';
 import fileDownload from 'js-file-download';
 import {DeleteOutlined} from '@ant-design/icons';
@@ -21,12 +23,15 @@ const {Title} = Typography;
 const App = () => {
 
     type File = {
-        fileName: string,
-        auditFile: object
+        audit_file: {
+            filename: string
+        },
+        audit_display_name: string
     };
 
     const [files, setFiles] = useState<File[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [modalIsVisible, setModalIsVisible] = useState<boolean>(false);
 
     useEffect(() => {
         fetchFiles();
@@ -129,10 +134,13 @@ const App = () => {
                     <Popconfirm
                         title={''}
                         onConfirm={() => {
-                            handleFileDownload(item.fileName);
+                            handleFileDownload(item.audit_file.filename);
+                        }}
+                        onCancel={() => {
+                            setModalIsVisible(true)
                         }}
                         okText="Download"
-                        cancelText="Cancel"
+                        cancelText="View Parsed"
                     >
                         <p
                             style={{
@@ -141,13 +149,13 @@ const App = () => {
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
                                 marginBottom: 0
-                            }}>{item.fileName}</p>
+                            }}>{item.audit_file.filename}</p>
                     </Popconfirm>
 
                     <Popconfirm
                         title={''}
                         onConfirm={() => {
-                            deleteFile(item.fileName);
+                            deleteFile(item.audit_file.filename);
                         }}
                         onCancel={() => message.info(`You're right!`, 0.7)}
                         okText="Delete"
@@ -156,6 +164,23 @@ const App = () => {
                         <DeleteOutlined style={{color: 'red'}}/>
                     </Popconfirm>
 
+                    <Modal style={{width: '100%'}} title={`${item.audit_display_name}`}
+                           visible={modalIsVisible}
+                           closable={true}
+                           onCancel={() => setModalIsVisible(false)}
+                           onOk={() => setModalIsVisible(false)}
+                    >
+                        <ReactJson
+                            displayObjectSize={true}
+                            enableClipboard={false}
+                            indentWidth={2}
+                            collapseStringsAfterLength={40}
+                            collapsed={1}
+                            src={item}
+                            theme={'bright:inverted'}
+                            displayDataTypes={false}
+                        />
+                    </Modal>
 
                 </List.Item>}
             />

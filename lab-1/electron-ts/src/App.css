@@ -1,14 +1,19 @@
 body {
     background-color: #faf9f9;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
 }
 
 .App {
-    margin: 50px auto 30px auto;
+    overflow-y: scroll;
+    height: 440px;
+    margin: 10px auto 30px auto;
     padding: 10px;
-    width: 70vw;
+    width: 100vw;
     /*height: 60vh;*/
-    border: 2px solid #555b6e;
-    border-radius: 7px;
+    /*border: 2px solid #555b6e;*/
+    /*border-radius: 7px;*/
 }
 
 .ant-upload.ant-upload-select {
@@ -17,4 +22,26 @@ body {
 
 .ant-popover-message {
     display: none;
+}
+
+.ant-modal {
+    width: 100%!important;
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{
+    width: 5px;
+    height: 5px;
+}
+::-webkit-scrollbar-thumb{
+    background: #B3AFB3;
+    border-radius: 30px;
+}
+::-webkit-scrollbar-thumb:hover{
+    background: #B3AFB3;
+}
+::-webkit-scrollbar-track{
+    background: #F0F0F0;
+    border-radius: 0px;
+    box-shadow: inset 0px 0px 0px 0px #F0F0F0;
 }

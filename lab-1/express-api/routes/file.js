@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // upload file
-router.post('/', upload.single('file'), controller.uploadFile);
+router.post('/', upload.single('file'), controller.uploadFile.bind(controller));
 
 // delete file
 router.delete('/:filename', controller.deleteFileByName);
@@ -38,6 +38,8 @@ router.get('/exists/:filename', controller.fileExistsByName);
 
 // download file
 router.get('/download/:filename', controller.downloadFileByName);
+
+router.post('/parse', controller.parseAuditFile)
 
 
 module.exports = router;
