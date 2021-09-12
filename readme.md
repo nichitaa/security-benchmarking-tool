@@ -45,4 +45,4 @@ $ yarn dev ( or npm run dev )
 
 ##### app recordings:
 
-![recording1](recordings\recording1.gif)
+![recording1](https://github.com/nichitaa/CS-Labs/blob/main/recordings/recording1.gif)
