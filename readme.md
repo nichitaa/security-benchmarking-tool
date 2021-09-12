@@ -43,3 +43,6 @@ $ yarn dev ( or npm run dev )
 
 
 
+##### app recordings:
+
+![recording1](recordings\recording1.gif)
