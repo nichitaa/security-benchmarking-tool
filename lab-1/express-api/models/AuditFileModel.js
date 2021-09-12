@@ -54,7 +54,7 @@ const AuditDocument = new Schema({
     audit_specifications: AuditSpecs,
 
     audit_file: {type: Schema.Types.ObjectId, ref: 'File'}
-});
+}, {timestamps: true});
 
 const AuditDocumentModel = mongoose.model('AuditDocument', AuditDocument);
 

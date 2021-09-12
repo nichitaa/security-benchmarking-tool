@@ -1,8 +1,52 @@
 const {AuditDocumentModel, FileModel} = require('../models/AuditFileModel');
 const fs = require('fs');
 const path = require('path');
+const {renderFile} = require('template-file');
 
 class FileController {
+
+    async insertAudit(req, res, next) {
+        try {
+            const body = req.body;
+            const filename = body.audit_filename;
+
+            // is unique
+            const found = await AuditDocumentModel.findOne({audit_filename: filename});
+            if (found !== null) res.send({isSuccess: false, error: `file ${filename} already exists`});
+
+            else {
+                const string = await renderFile(path.join(__dirname, '../models/template.audit'), body);
+                // console.log(string);
+                fs.writeFile(path.join(__dirname, `../uploads/${filename}`), string, function (err) {
+                    if (err) return res.status(500).json({isSuccess: false, error: err.message});
+                    const doc = {
+                        filename: filename,
+                        file: {
+                            content: fs.readFileSync(path.join(__dirname + '/../uploads/' + filename)),
+                            content_type: 'audit'
+                        }
+                    };
+                    const fileRecord = new FileModel(doc);
+                    fileRecord.save(err => {
+                        if (err) res.status(500).json({isSuccess: false, error: err.message});
+                        const auditDoc = {
+                            ...body,
+                            audit_file: fileRecord._id,
+                            audit_filename: filename
+                        };
+                        const auditDocumentRecord = new AuditDocumentModel(auditDoc);
+                        auditDocumentRecord.save(err => {
+                            if (err) res.status(500).json({isSuccess: false, error: err.message});
+                            res.status(200).json({isSuccess: true});
+                        });
+                    });
+                });
+            }
+        } catch (e) {
+            res.status(500).json({isSuccess: false, error: e.message});
+        }
+
+    }
 
     async uploadFile(req, res, next) {
         const filename = req.file.originalname;

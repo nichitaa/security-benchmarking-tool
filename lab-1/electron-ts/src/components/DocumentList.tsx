@@ -8,8 +8,11 @@ import {
     Upload
 } from "antd";
 import {
-    ArrowsAltOutlined, DeleteOutlined,
+    ArrowsAltOutlined,
+    DeleteOutlined,
     DownloadOutlined,
+    EditOutlined,
+    FileSearchOutlined,
     FileUnknownOutlined,
     FolderAddOutlined,
     InfoCircleOutlined
@@ -24,7 +27,9 @@ export const DocumentList = ({
                                  handleFileDownload,
                                  updateParsedViewItem,
                                  deleteFile,
-                                 handleFileUpload
+                                 handleFileUpload,
+                                 toggleIsEditView,
+                                 updateEditViewItem
                              }) =>
     <>
         <div style={{
@@ -33,7 +38,7 @@ export const DocumentList = ({
             marginBottom: '10px'
         }}>
             <Title
-                style={{display: 'inline-block'}}
+                style={{display: 'inline-block', color: '#645790'}}
                 level={4}>
                 <code>[{files.length}] audit files 👾</code>
             </Title>
@@ -43,8 +48,9 @@ export const DocumentList = ({
                 customRequest={handleFileUpload}>
                 <Button type={'default'}>Upload <FolderAddOutlined/></Button>
             </Upload>
+            {/*<Button onClick={() => toggleIsCreateView(true)}>Create <FileAddOutlined/></Button>*/}
             <Title
-                style={{display: 'inline-block'}}
+                style={{display: 'inline-block', color: '#645790'}}
                 level={4}>
                 <code>Pasecinic Nichita faf_192</code>
             </Title>
@@ -90,6 +96,21 @@ export const DocumentList = ({
                     cancelText="Cancel"
                 >
                     <DeleteOutlined style={{color: 'red'}}/>
+                </Popconfirm>
+                <Popconfirm
+                    icon={<FileSearchOutlined/>}
+                    placement={'topRight'}
+                    title={'Edit file ? 👀'}
+                    onConfirm={() => {
+                        toggleIsEditView(true);
+                        updateEditViewItem(item);
+                    }}
+                    onCancel={() => {
+                    }}
+                    okText={'Edit'}
+                    cancelText={'Cancel'}
+                >
+                    <EditOutlined style={{color: '#33A2FF'}}/>
                 </Popconfirm>
 
             </List.Item>}

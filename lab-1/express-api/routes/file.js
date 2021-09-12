@@ -39,7 +39,11 @@ router.get('/exists/:filename', controller.fileExistsByName);
 // download file
 router.get('/download/:filename', controller.downloadFileByName);
 
-router.post('/parse', controller.parseAuditFile)
+// test parse
+router.post('/parse', controller.parseAuditFile);
+
+// insert new audit
+router.post('/insert', controller.insertAudit);
 
 
 module.exports = router;

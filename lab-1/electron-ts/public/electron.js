@@ -3,11 +3,15 @@ const path = require('path');
 const {app, BrowserWindow} = require('electron');
 const isDev = require('electron-is-dev');
 
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+
 function createWindow() {
     // Create the browser window.
     const win = new BrowserWindow({
-        width: 700,
-        height: 600,
+        width: 1300,
+        height: 700,
+        minWidth: 700,
+        minHeight: 500,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
