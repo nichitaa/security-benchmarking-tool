@@ -1,28 +1,33 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import {Button, Typography} from "antd";
 import ReactJson from "react-json-view";
 import {BackwardFilled} from "@ant-design/icons";
-import {AuditDocument} from "../App";
+import {toggleIsParsedView, updateParseViewItem} from "../context/reducer";
+import {AppContext} from "../context/context";
 
 const {Title} = Typography;
 
-interface ParsedViewProps {
-    onBackClick: Function,
-    newWindowItem: AuditDocument
-}
+export const ParsedView = () => {
 
-export const ParsedView = (props: ParsedViewProps) =>
-    <>
+    const {state, dispatch} = useContext(AppContext);
+    const {parsedViewItem} = state
+
+    const onBackClick = () => {
+        dispatch(toggleIsParsedView(false))
+        dispatch(updateParseViewItem(null))
+    }
+
+    return <>
         <Title
             style={{textAlign: 'center', color: '#555b6e'}}
             level={5}>
             <Button
                 type={'dashed'}
                 danger={true}
-                onClick={() => props.onBackClick()}
+                onClick={onBackClick}
                 style={{marginRight: '10px'}}>
                 <BackwardFilled/> back</Button>
-            {props.newWindowItem.audit_display_name}
+            {parsedViewItem.audit_display_name}
         </Title>
         <ReactJson
             displayObjectSize={true}
@@ -30,8 +35,10 @@ export const ParsedView = (props: ParsedViewProps) =>
             indentWidth={6}
             collapseStringsAfterLength={50}
             collapsed={1}
-            src={props.newWindowItem}
+            src={parsedViewItem}
             theme={'eighties'}
             displayDataTypes={false}
         />
-    </>
+    </>;
+
+}
