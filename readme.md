@@ -1,4 +1,4 @@
-> CS-2021
+> CS-2021 SBT
 >
 > FAF 192 Y3-S1
 >
@@ -6,43 +6,59 @@
 
 
 
-#### Lab-1 (06-09-2021)
-
-Desktop app made with:
+Security benchmarking tool made with:
 
 - Electron 
 - React - TS ( UI library - antd)
 - Express (multer for file storage)
 - MongoDB (mongoose odm)
 
-##### To run this project
+-----------------------------------------
+
+##### [Lab - 1 Importing  Compliance  Audit  Policies](./tasks/CS_lab1.pdf)
+
+##### [Lab - 2 Creating  Custom  Audit  Policies](./tasks/CS_lab2.pdf)
+
+##### [Lab - 3 **Auditing**  a  Workstation](./tasks/CS_lab3.pdf)
+
+****
+
+##### To run it
 
 ```bash
 create new folder where to clone the project && and open it with cmd
 
-$ git clone .
-$ cd lab-1\electron-ts 
-$ yarn install ( or npm i )
+$ git clone https://github.com/nichitaa/CS-Labs
+$ # install dependencies
+$ cd app\electron-ts 
+$ yarn install # or npm install
 
-$ cd lab-1\express-api
-$ yarn install ( or npm i )
+$ cd app\express-api
+$ yarn install # or npm install
 
-create .env file
-$ cd lab-1\express-api
+$ # create .env file
+$ cd app\express-api
 $ echo MONGODB_UR > .env
+
 add MONGODB connection string to .env file
 (ex: MONGODB_URL=mongodb+srv://<YOUR_DB_USER>:<USER_PASSWORD>@cluster0.ccfyk.mongodb.net/cs-faf?retryWrites=true&w=majority)
 
-run application
-$ cd lab-1\express-api
-$ yarn dev ( or npm run dev )
+$ # run 
+$ cd app\express-api
+$ yarn dev # npm run dev
 
-$ cd lab-1\electron-ts
-$ yarn dev ( or npm run dev )
+$ cd app\electron-ts
+$ yarn dev # npm run dev
 ```
 
 
 
-##### app recordings:
+##### Demo
+
+#####  [ lab1 - lab2 ]
 
 ![recording1](https://github.com/nichitaa/CS-Labs/blob/main/recordings/recording1.gif)
+
+**[ lab1 - lab2 - lab3 ]**
+
+![recording1](https://github.com/nichitaa/CS-Labs/blob/main/recordings/gif2.gif)

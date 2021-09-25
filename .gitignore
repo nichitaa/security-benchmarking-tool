@@ -1,15 +1,15 @@
 .idea
-lab-1/.idea
-lab-1/express-api/.idea
-lab-1/electron-ts/.idea
+app/.idea
+app/express-api/.idea
+app/electron-ts/.idea
 
-lab-1/express-api/node_modules
-lab-1/express-api/.env
-lab-1/express-api/uploads/*
-lab-1/express-api/yarn-debug.log*
-lab-1/express-api/yarn-error.log*
+app/express-api/node_modules
+app/express-api/.env
+app/express-api/uploads/*
+app/express-api/yarn-debug.log*
+app/express-api/yarn-error.log*
 
-lab-1/electron-ts/node_modules
-lab-1/electron-ts/build
-lab-1/electron-ts/yarn-debug.log*
-lab-1/electron-ts/yarn-error.log*
+app/electron-ts/node_modules
+app/electron-ts/build
+app/electron-ts/yarn-debug.log*
+app/electron-ts/yarn-error.log*
