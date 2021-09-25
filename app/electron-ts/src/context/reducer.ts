@@ -54,10 +54,12 @@ export const inspectEditViewItem = () => async (dispatch, getState) => {
         }
         if (res.warning) {
             item['warning'] = true;
+            item['reason'] = res.reason;
             warningCounter++
         }
         if (!res.isSuccess) {
             item['passed'] = false;
+            item['reason'] = res.reason
             failedCounter++
         }
         console.log('res: ', res)

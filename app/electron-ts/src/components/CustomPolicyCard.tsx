@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Checkbox, Form, Input, Collapse, Typography, Button, Row, Col} from "antd";
 import {
     AlertOutlined,
-    CheckCircleOutlined,
+    CheckCircleOutlined, ExclamationCircleOutlined,
     FileAddOutlined,
     FileExcelOutlined,
     WarningOutlined
@@ -18,7 +18,8 @@ export const CustomPolicyCard = (props) => {
     const {policy} = props;
     const [loading, setLoading] = useState<null | boolean>(null);
     const [passed, setPassed] = useState<null | boolean>(null)
-    const [warning, setWarning] = useState<null | boolean>(null)
+    const [warning, setWarning] = useState<null | boolean>(null);
+    const [reason, setReason] = useState<null | string>(null);
 
     useEffect(() => {
         if (props.policy.passed !== undefined) {
@@ -36,7 +37,8 @@ export const CustomPolicyCard = (props) => {
                     console.log('response: ', res)
                     if (res.isSuccess) setPassed(true);
                     if (res.warning) setWarning(true);
-                    if (!res.isSuccess) setPassed(false)
+                    if (!res.isSuccess) setPassed(false);
+                    if (res.reason) setReason(res.reason)
                     setLoading(false)
                 })
         }, 200)
@@ -73,7 +75,7 @@ export const CustomPolicyCard = (props) => {
                             <Title
                                 style={{display: 'inline-block', fontSize: '15px'}}
                                 level={5}>
-                                <code>run</code>
+                                <code>scan</code>
                             </Title>
                         </Button>
                     </Col>
@@ -93,6 +95,13 @@ export const CustomPolicyCard = (props) => {
                             style={{padding: '5px'}}
                             bordered={false}
                         >
+                            {(policy.reason !== undefined || reason !== null) && <Panel style={{border: '1px solid #ff6380', borderRadius: '2px'}}
+                                                     header={<>reason <ExclamationCircleOutlined
+                                                         style={{color: '#ff6380'}}/></>} key={99}>
+                                <Form.Item>
+                                    <TextArea rows={7} defaultValue={policy.reason !== undefined ? policy.reason : reason}/>
+                                </Form.Item>
+                            </Panel>}
                             {policy.policy_type && <Panel header={'policy type'} key={1}>
                                 <Form.Item>
                                     <Input defaultValue={policy.policy_type}/>

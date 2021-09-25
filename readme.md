@@ -61,4 +61,5 @@ $ yarn dev # npm run dev
 
 **[ lab1 - lab2 - lab3 ]**
 
-![recording1](https://github.com/nichitaa/CS-Labs/blob/main/recordings/gif2.gif)
+![recording1](https://github.com/nichitaa/CS-Labs/blob/main/recordings/gif3.gif)
+

@@ -7,7 +7,7 @@ class AuditRegeditController {
     // https://docs.tenable.com/nessus/compliancechecksreference/Content/PDF/NessusComplianceChecksReference.pdf
     async testPolicy(req, res, next) {
         const body = req.body;
-        console.log(body);
+        // console.log(body);
         if (body.policy_type) {
             switch (body.policy_type) {
                 // if registry key exists or not
@@ -18,18 +18,30 @@ class AuditRegeditController {
                                 if (reg_check(regResult, body.policy_value_data, body.policy_key_item)) {
                                     return res.json({isSuccess: true, data: regResult});
                                 } else {
-                                    return res.json({isSuccess: false, data: regResult});
+                                    return res.json({
+                                        isSuccess: false,
+                                        data: regResult,
+                                        reason: `registry key: ${body.policy_key_item} does not exists in path: ${body.policy_value_data}`
+                                    });
                                 }
                             }
                             case 'MUST_NOT_EXIST': {
                                 if (!reg_check(regResult, body.policy_value_data, body.policy_key_item)) {
                                     return res.json({isSuccess: true, data: regResult});
                                 } else {
-                                    return res.json({isSuccess: false, data: regResult});
+                                    return res.json({
+                                        isSuccess: false,
+                                        data: regResult,
+                                        reason: `registry key: ${body.policy_key_item} exists in path: ${body.policy_value_data}`
+                                    });
                                 }
                             }
                             default: {
-                                return res.json({isSuccess: false, data: regResult});
+                                return res.json({
+                                    isSuccess: false,
+                                    data: regResult,
+                                    reason: `invalid registry option ${body.policy_reg_option} (accepting only: MUST_EXIST | MUST_NOT_EXIST`
+                                });
                             }
                         }
                     });
@@ -37,51 +49,77 @@ class AuditRegeditController {
                 }
                 // checks the value of a registry key
                 case 'REGISTRY_SETTING': {
-                    console.log('registry settings');
                     regedit.list(body.policy_reg_key, function (err, regResult) {
                         const r = regResult[body.policy_reg_key];
-                        // console.log('r: ', r);
                         if (r.exists) {
-                            // console.log('exists');
-                            // console.log('key: ', body.policy_reg_item);
-                            // console.log('val: ', r.values[body.policy_reg_item]);
                             if (r.values[body.policy_reg_item] !== undefined) {
-                                console.log('item: ', r.values[body.policy_reg_item]);
+                                // console.log('item: ', r.values[body.policy_reg_item]);
                                 const bool = isNumeric(body.policy_value_data);
                                 let valCompare = null;
                                 if (bool) valCompare = parseInt(body.policy_value_data);
                                 const [isArr, arrComp] = isArray(body.policy_value_data);
                                 const [isArrReg, arrReg] = isArray(r.values[body.policy_reg_item].value);
                                 if (isArr && isArrReg) {
-                                    // console.log("both arrays:");
                                     if (arrComp.every(el => arrReg.includes(el))) {
                                         return res.json({isSuccess: true, data: regResult});
+                                    } else {
+                                        return res.json({
+                                            isSuccess: true,
+                                            data: regResult,
+                                            reason: `not all values from:  ${JSON.stringify(arrComp)} are present in ${JSON.stringify(arrReg)}`
+                                        });
                                     }
                                 }
                                 if (r.values[body.policy_reg_item].value === valCompare) {
                                     return res.json({isSuccess: true, data: regResult});
                                 } else if (body.policy_reg_option && body.policy_reg_option === 'CAN_NOT_BE_NULL' && r.values[body.policy_reg_item].value !== null) {
-                                    return res.json({isSuccess: true, warning: true, data: regResult});
+                                    return res.json({
+                                        isSuccess: true,
+                                        warning: true,
+                                        data: regResult,
+                                        reason: `Registry value: ${r.values[body.policy_reg_item].value} is different from expected value: ${valCompare}, but validated CAN_NOT_BE_NULL`
+                                    });
                                 } else if (body.policy_reg_option && body.policy_reg_option === 'CAN_BE_NULL') {
-                                    return res.json({isSuccess: true, warning: true, data: regResult});
+                                    return res.json({
+                                        isSuccess: true,
+                                        warning: true,
+                                        data: regResult,
+                                        reason: `Registry value: ${r.values[body.policy_reg_item].value} is different from expected value: ${valCompare}, but validates CAN_BE_NULL`
+                                    });
                                 } else {
-                                    return res.json({isSuccess: false, warning: true, data: regResult});
+                                    return res.json({
+                                        isSuccess: false,
+                                        warning: true,
+                                        data: regResult,
+                                        reason: `Registry value: ${r.values[body.policy_reg_item].value} does not match expected value: ${valCompare}`
+                                    });
                                 }
                             } else {
-                                return res.json({isSuccess: false, data: regResult});
+                                return res.json({
+                                    isSuccess: false,
+                                    data: regResult,
+                                    reason: `Registry value: ${r.values[body.policy_reg_item]} does not exists in path: ${body.policy_reg_key}`
+                                });
                             }
                         } else {
-                            return res.json({isSuccess: false, data: regResult});
+                            return res.json({
+                                isSuccess: false,
+                                data: regResult,
+                                reason: `Could not find registry path: ${body.policy_reg_key} on this machine`
+                            });
                         }
                     });
                     break;
                 }
                 default: {
-                    return res.json({isSuccess: false, err: 'no such policy type'});
+                    return res.json({
+                        isSuccess: false,
+                        reason: `invalid policy type: ${body.policy_type} (accepting only: REG_CHECK | REGISTRY_SETTING)`
+                    });
                 }
             }
         } else {
-            res.json({isSuccess: true});
+            res.json({isSuccess: false, reason: `Can not validate policy type: ${body.policy_type}`});
         }
     }
 
@@ -89,9 +127,7 @@ class AuditRegeditController {
 }
 
 function reg_check(reg, path, key) {
-    // console.log('reg: ', reg);
     const r = reg[path];
-    // console.log('r: ', r);
     if (r.exists) {
         return r.values[key];
     } else {
@@ -100,16 +136,15 @@ function reg_check(reg, path, key) {
 }
 
 function isArray(str) {
-    if(typeof str === 'string') {
+    if (typeof str === 'string') {
         let split = str.split(',');
         if (split.length !== 0) {
             split = split.map(el => el.trim());
-            // console.log('split: ', split);
             return [true, split];
         }
-        return [false, []]
+        return [false, []];
     }
-    return [false, []]
+    return [false, []];
 }
 
 function isNumeric(str) {

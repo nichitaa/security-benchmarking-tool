@@ -16,6 +16,7 @@ export interface IAuditCustomItem {
     policy_key_item?: string,
     passed?: boolean,
     warning?: boolean,
+    reason?: string,
     isActive?: boolean
 }
 
