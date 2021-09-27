@@ -17,7 +17,8 @@ export interface IAuditCustomItem {
     passed?: boolean,
     warning?: boolean,
     reason?: string,
-    isActive?: boolean
+    isActive?: boolean,
+    isEnforced?: boolean
 }
 
 export interface IAuditVariable {

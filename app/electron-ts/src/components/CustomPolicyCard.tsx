@@ -1,47 +1,35 @@
-import React, {useEffect, useState} from 'react';
-import {Checkbox, Form, Input, Collapse, Typography, Button, Row, Col} from "antd";
+import React, {useContext, useState} from 'react';
+import {Checkbox, Form, Input, Collapse, Typography, Button, Row, Col, Tag} from "antd";
 import {
     AlertOutlined,
-    CheckCircleOutlined, ExclamationCircleOutlined,
+    CheckCircleOutlined,
+    ExclamationCircleOutlined,
     FileAddOutlined,
     FileExcelOutlined,
     WarningOutlined
 } from "@ant-design/icons";
-import {testCustomItem} from "../services/api";
+import {singlePolicyFixAction, singlePolicyScanAction} from "../context/reducer";
+import {AppContext} from "../context/context";
 
 const {TextArea} = Input;
 const {Panel} = Collapse;
-const {Title} = Typography;
+const {Title, Text} = Typography;
 
 
 export const CustomPolicyCard = (props) => {
+    const {dispatch} = useContext(AppContext)
     const {policy} = props;
     const [loading, setLoading] = useState<null | boolean>(null);
-    const [passed, setPassed] = useState<null | boolean>(null)
-    const [warning, setWarning] = useState<null | boolean>(null);
-    const [reason, setReason] = useState<null | string>(null);
 
-    useEffect(() => {
-        if (props.policy.passed !== undefined) {
-            setLoading(false); // to display the icons result
-            setPassed(props.policy.passed);
-        }
-        if (props.policy.warning !== undefined) setWarning(props.policy.warning);
-    }, [props])
-
-    const test = () => {
+    const singlePolicyScan = () => {
         setLoading(true);
-        setTimeout(() => {
-            testCustomItem(policy)
-                .then(res => {
-                    console.log('response: ', res)
-                    if (res.isSuccess) setPassed(true);
-                    if (res.warning) setWarning(true);
-                    if (!res.isSuccess) setPassed(false);
-                    if (res.reason) setReason(res.reason)
-                    setLoading(false)
-                })
-        }, 200)
+        dispatch(singlePolicyScanAction(policy, () => setLoading(false)));
+    }
+
+
+    const applySinglePolicyFix = () => {
+        setLoading(true);
+        dispatch(singlePolicyFixAction(policy, () => setLoading(false)));
     }
 
     return (
@@ -49,7 +37,7 @@ export const CustomPolicyCard = (props) => {
             border: '1px solid #f0f0f0',
             borderRadius: '6px',
             padding: '10px',
-            background: 'rgba(0, 0, 0, 0.01)'
+            background: 'rgba(0, 0, 0, 0.07)'
         }}>
             <Form
                 wrapperCol={{span: 24}}
@@ -61,16 +49,16 @@ export const CustomPolicyCard = (props) => {
                                   checked={policy.isActive}/>
                     </Form.Item>
                     <Col>
-                        {(loading !== null || props.passed !== undefined)
-                        && <>
-                            {warning !== null && warning &&
-                            <AlertOutlined style={{color: '#fca103', marginRight: '5px', fontSize: '18px'}}/>}
-                            {passed !== null && passed &&
-                            <CheckCircleOutlined style={{color: 'green', marginRight: '5px', fontSize: '18px'}}/>}
-                            {passed !== null && !passed &&
-                            <WarningOutlined style={{color: 'red', marginRight: '5px', fontSize: '18px'}}/>}
-                        </>}
-                        <Button size={'small'} type={'text'} onClick={test}
+                        {policy.isEnforced !== undefined && policy.isEnforced &&
+                        <Tag style={{cursor: 'pointer'}} color={'red'} onClick={() => applySinglePolicyFix()}>apply
+                            fix</Tag>}
+                        {policy.warning &&
+                        <AlertOutlined style={{color: '#fca103', marginRight: '5px', fontSize: '18px'}}/>}
+                        {policy.passed &&
+                        <CheckCircleOutlined style={{color: 'green', marginRight: '5px', fontSize: '18px'}}/>}
+                        {policy.passed !== undefined && !policy.passed &&
+                        <WarningOutlined style={{color: 'red', marginRight: '5px', fontSize: '18px'}}/>}
+                        <Button size={'small'} type={'text'} onClick={singlePolicyScan}
                                 loading={loading === null ? false : loading}>
                             <Title
                                 style={{display: 'inline-block', fontSize: '15px'}}
@@ -79,14 +67,13 @@ export const CustomPolicyCard = (props) => {
                             </Title>
                         </Button>
                     </Col>
-
                 </Row>
                 <Collapse>
-                    <Panel header={<Title
-                        style={{display: 'inline-block', color: '#645790', fontSize: '15px'}}
-                        level={5}>
-                        <code>[#{props.idx + 1} {policy.policy_type}] 📑</code>
-                    </Title>} key={0}>
+                    <Panel header={
+                        <Text style={{color: '#645790', fontWeight: 'bold', fontSize: '15px'}}
+                              code={true}>[#{props.idx + 1} {policy.policy_type}] 📑
+                        </Text>
+                    } key={0}>
                         <Collapse
                             expandIcon={({isActive}) => {
                                 if (isActive) return <FileExcelOutlined/>
@@ -95,11 +82,13 @@ export const CustomPolicyCard = (props) => {
                             style={{padding: '5px'}}
                             bordered={false}
                         >
-                            {(policy.reason !== undefined || reason !== null) && <Panel style={{border: '1px solid #ff6380', borderRadius: '2px'}}
-                                                     header={<>reason <ExclamationCircleOutlined
-                                                         style={{color: '#ff6380'}}/></>} key={99}>
+                            {(policy.reason && policy.reason !== '') &&
+                            <Panel style={{border: '1px solid #ff6380', borderRadius: '2px'}}
+                                   header={<>reason <ExclamationCircleOutlined
+                                       style={{color: '#ff6380'}}/></>} key={99}>
                                 <Form.Item>
-                                    <TextArea rows={7} defaultValue={policy.reason !== undefined ? policy.reason : reason}/>
+                                    <TextArea rows={7}
+                                              defaultValue={policy.reason}/>
                                 </Form.Item>
                             </Panel>}
                             {policy.policy_type && <Panel header={'policy type'} key={1}>

@@ -8,6 +8,24 @@ const regeditApi = axios.create({
     baseURL: 'http://localhost:8080/api/regedit'
 });
 
+export const policyBatchFix = async (items) => {
+    return await regeditApi.post('/batch_enforce', {items})
+        .then(res => res.data)
+        .catch(err => err.message)
+}
+
+export const backupRegistry = async () => {
+    return await regeditApi.post('/backup')
+        .then(res => res.data)
+        .catch(err => err.message)
+}
+
+export const enforcePolicyItem = async (item) => {
+    return await regeditApi.post('/enforce', item)
+        .then(res => res.data)
+        .catch(err => err.message)
+}
+
 export const testCustomItem = async (item) => {
     // const body = {data: JSON.stringify(item)}
     return await regeditApi.post('/', item)
