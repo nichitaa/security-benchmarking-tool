@@ -90,7 +90,6 @@ export const DocumentList = () => {
         }
     };
 
-
     const handleFileDownload = async (filename) => {
         downloadAuditFile(filename)
             .then(file => {
@@ -107,6 +106,7 @@ export const DocumentList = () => {
         dispatch(updateParseViewItem(item))
         dispatch(toggleIsParsedView(true))
     }
+
     return <>
         <div style={{
             display: 'flex',
@@ -134,7 +134,7 @@ export const DocumentList = () => {
             style={{overflow: 'hidden'}}
             loading={files_loading}
             size="small"
-            header={<p style={{marginBottom: 0}}>Documents Archive:</p>}
+            header={<p style={{marginBottom: 0}}>Audits Archive:</p>}
             bordered
             dataSource={files}
             renderItem={(item) => <List.Item

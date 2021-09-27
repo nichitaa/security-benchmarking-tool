@@ -1,7 +1,14 @@
 import {AppState} from "./state";
-import {fetchAuditDocuments, testCustomItem} from "../services/api";
+import {
+    backupRegistry,
+    enforcePolicyItem,
+    fetchAuditDocuments,
+    policyBatchFix,
+    testCustomItem
+} from "../services/api";
 import {ActionType} from "./actions";
 import {IAuditCustomItem} from "../types";
+import {showMessage} from "../utils";
 
 export const appReducer = (state: AppState, {type, payload}): AppState => {
     switch (type) {
@@ -19,21 +26,123 @@ export const appReducer = (state: AppState, {type, payload}): AppState => {
             return {...state, parsedViewItem: payload}
         case ActionType.ToggleShowInspectionResult:
             return {...state, showInspectionResult: payload}
-        case ActionType.InspectEditViewItem:
+        case ActionType.UpdateSytemScanStats:
             return {
                 ...state,
                 inspectIsLoading: false,
                 failNumber: payload.fail,
                 warningNumber: payload.warn,
                 passedNumber: payload.pass,
-                showInspectionResult: true,
-                editViewItem: {...state.editViewItem, audit_custom_items: payload.audit_custom_items}
+                showInspectionResult: true
             }
         case ActionType.ToggleInspectIsLoading:
             return {...state, inspectIsLoading: payload}
+        case ActionType.UpdateEditViewCustomItems:
+            return {...state, editViewItem: {...state.editViewItem, audit_custom_items: payload}}
+        case ActionType.ToggleBackupLoading:
+            return {...state, backupLoading: payload}
+        case ActionType.ToggleBatchFixPolicyItemsLoading:
+            return {...state, batchFixLoading: payload}
         default:
             return state;
     }
+}
+
+export const updateEditViewItemPolicies = (policy: IAuditCustomItem, upd: IAuditCustomItem) => (dispatch, getState) => {
+    const state = getState();
+    const {editViewItem} = state;
+    const {audit_custom_items} = editViewItem;
+    let temp: IAuditCustomItem[] = [];
+    temp = audit_custom_items.map(el => el.policy_reference === policy.policy_reference && el.policy_description === policy.policy_description ? {...el, ...upd} : el)
+    dispatch({type: ActionType.UpdateEditViewCustomItems, payload: temp})
+}
+
+
+export const singlePolicyFixAction = (policy: IAuditCustomItem, cb?) => async (dispatch, getState) => {
+    enforcePolicyItem(policy)
+        .then(res => {
+            console.log('single fix response: ', res)
+            if (res.isSuccess) {
+                dispatch(singlePolicyScanAction(policy, cb))
+            } else {
+                cb()
+            }
+        })
+}
+
+export const singlePolicyScanAction = (policy, cb) => async (dispatch, getState) => {
+    testCustomItem(policy)
+        .then(res => {
+            console.log('single scan response: ', res)
+            dispatch(updateEditViewItemPolicies(policy, {
+                passed: res.isSuccess,
+                warning: res.warning,
+                reason: res.reason,
+                isEnforced: !res.isSuccess || res.warning ? true : undefined
+            }))
+            setTimeout(() => {
+                cb()
+            }, 300)
+        })
+}
+
+export const batchPolicyItemsFixAction = () => async (dispatch, getState) => {
+    dispatch({type: ActionType.ToggleBatchFixPolicyItemsLoading, payload: true})
+    const state = getState();
+    const {editViewItem} = state;
+    const {audit_custom_items} = editViewItem;
+    let temp: IAuditCustomItem[] = [];
+    // temp = audit_custom_items.filter(el => el.isEnforced)
+    audit_custom_items.forEach(el => {
+        if (el.isEnforced) {
+            temp.push({...el})
+        }
+    })
+    console.log('batch: ', temp)
+    if (temp.length) {
+        policyBatchFix(temp)
+            .then(res => {
+                console.log('[response] fix all policy items: ', res)
+                dispatch({type: ActionType.ToggleBatchFixPolicyItemsLoading, payload: false})
+                dispatch(inspectEditViewItem())
+            })
+            .catch(err => {
+                console.log('batch fix error: ', err.message)
+                dispatch({type: ActionType.ToggleBatchFixPolicyItemsLoading, payload: false})
+            })
+    } else {
+        showMessage('error', 'No policy items to fix', 2)
+        dispatch({type: ActionType.ToggleBatchFixPolicyItemsLoading, payload: false})
+    }
+}
+
+export const backupMachineRegistry = () => async (dispatch, getState) => {
+    dispatch({type: ActionType.ToggleBackupLoading, payload: true})
+    backupRegistry()
+        .then(res => {
+            console.log('backup result: ', res)
+            dispatch({type: ActionType.ToggleBackupLoading, payload: false})
+            if (res.isSuccess) {
+                showMessage('success', `Full system registry backup in directory ${res.dir}`, 5)
+            } else {
+                showMessage('error', res.error, 2)
+            }
+        })
+}
+
+export const enforceAllPolicies = (bool) => async (dispatch, getState) => {
+    const state = getState();
+    const {editViewItem} = state;
+    const {audit_custom_items} = editViewItem;
+    const temp: IAuditCustomItem[] = [];
+    audit_custom_items.forEach(el => {
+        if (el.passed === false || el.warning === true) {
+            temp.push({...el, isEnforced: bool})
+        } else {
+            temp.push({...el})
+        }
+    })
+    dispatch({type: ActionType.UpdateEditViewCustomItems, payload: temp})
 }
 
 export const inspectEditViewItem = () => async (dispatch, getState) => {
@@ -41,37 +150,32 @@ export const inspectEditViewItem = () => async (dispatch, getState) => {
     const state = getState();
     const {editViewItem} = state;
     const {audit_custom_items} = editViewItem;
-    const temp: IAuditCustomItem[] = [];
     let passedCounter = 0;
     let failedCounter = 0;
     let warningCounter = 0;
     for (let i = 0; i < audit_custom_items.length; i++) {
         const item = audit_custom_items[i];
         const res = await testCustomItem(item)
-        if (res.isSuccess) {
-            item['passed'] = true;
-            if (res.warning === undefined) passedCounter++
+        const updateObj: IAuditCustomItem = {
+            passed: res.isSuccess,
+            warning: res.warning,
+            isEnforced: false,
+            reason: res.reason
         }
-        if (res.warning) {
-            item['warning'] = true;
-            item['reason'] = res.reason;
-            warningCounter++
-        }
-        if (!res.isSuccess) {
-            item['passed'] = false;
-            item['reason'] = res.reason
-            failedCounter++
-        }
-        console.log('res: ', res)
-        temp.push(item)
+        if (res.isSuccess && !res.warning) passedCounter++
+        if (res.warning) warningCounter++
+        if (!res.isSuccess) failedCounter++
+
+        // show live time results
+        dispatch(updateEditViewItemPolicies(item, updateObj))
     }
+    dispatch({type: ActionType.ToggleInspectIsLoading, payload: false});
     dispatch({
-        type: ActionType.InspectEditViewItem,
-        payload: {audit_custom_items: temp, fail: failedCounter, pass: passedCounter, warn: warningCounter}
-    })
+        type: ActionType.UpdateSytemScanStats,
+        payload: {fail: failedCounter, warn: warningCounter, pass: passedCounter}
+    });
 }
 
-// helper functions to handle with state
 export const fetchData = () => (dispatch, getState) => {
     dispatch({type: ActionType.FetchDocumentsLoading, payload: true})
     fetchAuditDocuments()

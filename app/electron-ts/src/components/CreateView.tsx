@@ -1,19 +1,35 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, Col, Input, Row, Switch, Typography, Spin} from "antd";
+import {Button, Col, Input, Row, Switch, Typography, Spin, Tag, Collapse} from "antd";
 import {CustomPolicyCard} from "./CustomPolicyCard";
 import {objectClone, showMessage} from "../utils";
 import {insertAuditDocument} from "../services/api";
 import {AppContext} from "../context/context";
-import {inspectEditViewItem, toggleIsEditView} from "../context/reducer";
+import {
+    backupMachineRegistry,
+    batchPolicyItemsFixAction,
+    enforceAllPolicies,
+    inspectEditViewItem,
+    toggleIsEditView
+} from "../context/reducer";
 import {IAuditCustomItem, IAuditDocument} from "../types";
 
+const {Panel} = Collapse;
 const {Search} = Input;
-const {Title} = Typography;
+const {Title, Text} = Typography;
 
 const CreateView = () => {
 
     const {state, dispatch} = useContext(AppContext)
-    const {editViewItem, inspectIsLoading, passedNumber, failNumber, warningNumber, showInspectionResult} = state
+    const {
+        editViewItem,
+        inspectIsLoading,
+        passedNumber,
+        failNumber,
+        warningNumber,
+        showInspectionResult,
+        backupLoading,
+        batchFixLoading
+    } = state
 
     const [auditContent, setAuditContent] = useState<IAuditDocument>({});
     const [newAuditDocumentName, setNewAuditDocumentName] = useState<string>('');
@@ -50,6 +66,10 @@ const CreateView = () => {
             });
             setFilteredCustomItems(prev => temp);
         }
+    }
+
+    const enforceFailedTests = (bool) => {
+        dispatch(enforceAllPolicies(bool))
     }
 
     const togglePolicyActiveState = (bool) => {
@@ -113,16 +133,25 @@ const CreateView = () => {
         if (e.target.value.trim().length === e.target.value.length) setNewAuditDocumentName(prev => e.target.value)
     }
 
+    const fixEnforcedItems = () => {
+        dispatch(batchPolicyItemsFixAction());
+    }
+
+    const backupRegistryKeys = () => {
+        dispatch(backupMachineRegistry())
+    }
+
     return <>
-        <Spin spinning={inspectIsLoading} tip={'Running inspection on this machine...'}>
+        <Spin spinning={inspectIsLoading || backupLoading || batchFixLoading}
+              tip={inspectIsLoading ? 'scanning system...' : backupLoading ? 'backup system registry...' : 'applying policy constraints on system...'}>
             <Row gutter={[8, 8]} style={{marginBottom: '10px'}}>
                 <Col span={4}>
                     <Button danger={true} type={'dashed'} style={{width: '100%'}}
                             onClick={() => dispatch(toggleIsEditView(false))}>{'< Back'}</Button>
                 </Col>
                 <Col style={{textAlign: 'center'}} offset={6} span={6}>
-                    <Switch checkedChildren={'all policies active'}
-                            unCheckedChildren={'all policies disabled'}
+                    <Switch checkedChildren={'disable all'}
+                            unCheckedChildren={'select all'}
                             defaultChecked={true}
                             onChange={bool => togglePolicyActiveState(bool)}/>
                 </Col>
@@ -134,7 +163,7 @@ const CreateView = () => {
                 <Col span={4}>
                     <Button loading={inspectIsLoading} onClick={handleInspectAll}
                             style={{width: '100%', color: '#fca103', borderColor: '#fca103'}}>
-                        Inspect all
+                        System scan
                     </Button>
                 </Col>
             </Row>
@@ -174,14 +203,51 @@ const CreateView = () => {
                         && <Title
                             style={{display: 'inline-block', color: '#645790', fontSize: '15px'}}
                             level={5}>
-                            <code>passed: [{passedNumber}] 😄 warning: [{warningNumber}] 😕 fail: [{failNumber}]
-                                💀</code>
+                            <Tag color="green">passed [{passedNumber}] 😄</Tag>
+                            <Tag color="gold">warning [{warningNumber}] 😕</Tag>
+                            <Tag color="volcano">fail [{failNumber}] 💀</Tag>
                         </Title>}
                     </Col>
                 </Row>
             </Row>
+            <Row gutter={[8, 8]} style={{width: '100%'}}>
+                <Collapse style={{width: '100%'}}>
+                    <Panel header={
+                        <Text style={{fontWeight: 'bold', color: '#9E2A2B', fontSize: '17px'}} code={true}>ADVANCE
+                            SYSTEM FIX !</Text>
+                    } key={'0'}>
+                        <Row gutter={[8, 8]} justify={'space-between'}>
+                            <Col>
+                                <Text code={true}
+                                      style={{fontWeight: 'bold', color: '#645790'}}>
+                                    select all failed
+                                    items</Text>
+                                <Switch
+                                    size={'small'}
+                                    style={{marginRight: '5px'}}
+                                    // checkedChildren={'disable'}
+                                    // unCheckedChildren={'select'}
+                                    defaultChecked={false}
+                                    onChange={bool => enforceFailedTests(bool)}
+                                />
+                            </Col>
+                            <Col>
+                                <Button size={'small'} danger={true} onClick={() => fixEnforcedItems()}>
+                                    Fix enforced items
+                                </Button>
+                            </Col>
+                            <Col>
+                                <Button size={'small'} style={{color: 'green', borderColor: 'green'}}
+                                        onClick={() => backupRegistryKeys()}>Backup
+                                    Registry
+                                </Button>
+                            </Col>
+                        </Row>
+                    </Panel>
+                </Collapse>
+            </Row>
 
-            <Row gutter={[8, 8]}>
+            <Row gutter={[8, 8]} style={{marginTop: '10px'}}>
                 {filteredCustomItems.map((item, index) => {
                     return <Col key={index} span={filteredCustomItems.length === 1 ? 24 : 12}>
                         <CustomPolicyCard

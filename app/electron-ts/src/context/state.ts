@@ -11,7 +11,9 @@ export interface AppState {
     inspectIsLoading: boolean,
     passedNumber: number | null,
     warningNumber: number| null,
-    failNumber: number| null
+    failNumber: number| null,
+    backupLoading: boolean,
+    batchFixLoading: boolean
 }
 
 export const InitialAppState: AppState = {
@@ -25,5 +27,7 @@ export const InitialAppState: AppState = {
     showInspectionResult: false,
     passedNumber: 0,
     warningNumber: 0,
-    failNumber: 0
+    failNumber: 0,
+    backupLoading: false,
+    batchFixLoading: false
 }
