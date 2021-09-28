@@ -5,12 +5,13 @@ export enum ActionType {
     UpdateParsedViewItem = 'UpdateParsedViewItem',
     ToggleIsEditView = 'ToggleIsEditView',
     UpdateEditViewItem = 'UpdateEditViewItem',
-    UpdateSytemScanStats = 'UpdateSytemScanStats',
+    UpdateSystemScanStats = 'UpdateSystemScanStats',
     ToggleInspectIsLoading = 'ToggleInspectIsLoading',
     ToggleShowInspectionResult = 'ToggleShowInspectionResult',
     UpdateEditViewCustomItems = 'UpdateEditViewCustomItems',
     ToggleBackupLoading = 'ToggleBackupLoading',
-    ToggleBatchFixPolicyItemsLoading = 'ToggleBatchFixPolicyItemsLoading'
+    ToggleBatchFixPolicyItemsLoading = 'ToggleBatchFixPolicyItemsLoading',
+    UpdateFilteredCustomItems = 'UpdateFilteredCustomItems'
 }
 
 export type AppActions = ActionType

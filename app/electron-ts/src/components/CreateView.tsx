@@ -1,17 +1,18 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {Button, Col, Input, Row, Switch, Typography, Spin, Tag, Collapse} from "antd";
+import {Button, Col, Input, Row, Switch, Typography, Badge, Tooltip, Spin, Tag, Collapse, Alert, Checkbox} from "antd";
 import {CustomPolicyCard} from "./CustomPolicyCard";
 import {objectClone, showMessage} from "../utils";
 import {insertAuditDocument} from "../services/api";
 import {AppContext} from "../context/context";
+import {MinusCircleOutlined, PlusCircleOutlined, SecurityScanOutlined} from '@ant-design/icons';
 import {
     backupMachineRegistry,
     batchPolicyItemsFixAction,
     enforceAllPolicies,
     inspectEditViewItem,
-    toggleIsEditView
+    toggleIsEditView, updateEditViewItemPolicies, updateFilteredCustomItemsAction
 } from "../context/reducer";
-import {IAuditCustomItem, IAuditDocument} from "../types";
+import {IAuditCustomItem} from "../types";
 
 const {Panel} = Collapse;
 const {Search} = Input;
@@ -28,32 +29,28 @@ const CreateView = () => {
         warningNumber,
         showInspectionResult,
         backupLoading,
-        batchFixLoading
+        batchFixLoading,
+        filteredCustomItems
     } = state
 
-    const [auditContent, setAuditContent] = useState<IAuditDocument>({});
     const [newAuditDocumentName, setNewAuditDocumentName] = useState<string>('');
-    const [filteredCustomItems, setFilteredCustomItems] = useState<IAuditCustomItem[]>([]);
-    const [initialCustomItems, setInitialCustomItems] = useState<IAuditCustomItem[]>([]);
     const [searchValue, setSearchValue] = useState<string>('');
 
     useEffect(() => {
-        const clone = objectClone(editViewItem);
-        setAuditContent(clone);
-        const temp: IAuditCustomItem[] = [];
-        for (let el of clone.audit_custom_items) temp.push({...el, isActive: true});
-        setFilteredCustomItems(prev => temp);
-        setInitialCustomItems(prev => temp);
-    }, [editViewItem]);
+        dispatch(updateFilteredCustomItemsAction(editViewItem.audit_custom_items))
+        return () => {
+            dispatch(updateFilteredCustomItemsAction([]))
+        }
+    }, [])
 
     const onSearchChange = (search) => {
         const searchString = search.toLowerCase();
         setSearchValue(prev => searchString);
         if (searchString.trim() === '') {
-            setFilteredCustomItems(prev => initialCustomItems)
+            dispatch(updateFilteredCustomItemsAction(editViewItem.audit_custom_items))
         } else {
-            const temp: object[] = [];
-            initialCustomItems.map(el => {
+            const temp: IAuditCustomItem[] = [];
+            editViewItem.audit_custom_items.forEach(el => {
                 let includes = false;
                 for (let key in el) {
                     if (typeof el[key] === 'string') {
@@ -62,9 +59,8 @@ const CreateView = () => {
                     }
                 }
                 if (includes) temp.push(el)
-                return el;
-            });
-            setFilteredCustomItems(prev => temp);
+            })
+            dispatch(updateFilteredCustomItemsAction(temp))
         }
     }
 
@@ -72,43 +68,17 @@ const CreateView = () => {
         dispatch(enforceAllPolicies(bool))
     }
 
-    const togglePolicyActiveState = (bool) => {
-        const temp: object[] = [];
-        for (let el of initialCustomItems) {
-            temp.push({...el, isActive: bool})
-        }
-        setSearchValue(prev => '');
-        setFilteredCustomItems(prev => temp);
-        setInitialCustomItems(prev => temp);
-    }
-
-    const updateSinglePolicyActiveState = (bool, idx) => {
-        let item: IAuditCustomItem = {}
-        setFilteredCustomItems(prev => prev.map((el, index) => {
-            if (idx === index) {
-                el.isActive = bool;
-                item = el;
-            }
-            return el;
-        }))
-        const areSameObjects = (obj1, obj2) => {
-            return JSON.stringify(obj1) === JSON.stringify(obj2)
-        }
-
-
-        setInitialCustomItems(prev => prev.map(el => {
-            if (areSameObjects(el, item)) {
-                el.isActive = item.isActive
-            }
-            return el;
-        }))
+    const toggleAllPoliciesActiveState = (bool) => {
+        editViewItem.audit_custom_items.forEach(el => {
+            dispatch(updateEditViewItemPolicies(el, {isActive: bool}))
+        })
     }
 
     const saveCurrentConfiguration = () => {
         if (newAuditDocumentName.trim() === '') {
             showMessage('error', 'please enter new audit document name', 2);
         } else {
-            const body = auditContent;
+            const body = editViewItem;
             const activePolicies = filteredCustomItems.filter((el: IAuditCustomItem) => el.isActive);
             body.audit_custom_items = [...activePolicies];
             body.audit_filename = newAuditDocumentName + '.audit';
@@ -149,22 +119,31 @@ const CreateView = () => {
                     <Button danger={true} type={'dashed'} style={{width: '100%'}}
                             onClick={() => dispatch(toggleIsEditView(false))}>{'< Back'}</Button>
                 </Col>
-                <Col style={{textAlign: 'center'}} offset={6} span={6}>
-                    <Switch checkedChildren={'disable all'}
-                            unCheckedChildren={'select all'}
-                            defaultChecked={true}
-                            onChange={bool => togglePolicyActiveState(bool)}/>
+                <Col style={{textAlign: 'center'}} offset={8} span={6}>
+                    <Checkbox onChange={(e) => {
+                        toggleAllPoliciesActiveState(e.target.checked)
+                    }}>
+                        <Text
+                            style={{fontWeight: 'bold', fontSize: '15px'}}
+                            code={true}>
+                            check all items
+                        </Text>
+                    </Checkbox>
                 </Col>
                 <Col span={4}>
                     <Button style={{width: '100%'}} onClick={saveCurrentConfiguration}>
                         Save
                     </Button>
                 </Col>
-                <Col span={4}>
-                    <Button loading={inspectIsLoading} onClick={handleInspectAll}
-                            style={{width: '100%', color: '#fca103', borderColor: '#fca103'}}>
-                        System scan
-                    </Button>
+                <Col span={2} style={{textAlign: 'center'}}>
+                    <Tooltip title="System Scan" placement={'bottomRight'}>
+                        <Button onClick={handleInspectAll}
+                                loading={inspectIsLoading}
+                                shape="circle"
+                                style={{color: '#fca103', borderColor: '#fca103'}}
+                                icon={<SecurityScanOutlined/>}
+                        />
+                    </Tooltip>
                 </Col>
             </Row>
 
@@ -183,14 +162,13 @@ const CreateView = () => {
                     <Search
                         placeholder="find a policy by a keyword"
                         allowClear
-                        enterButton="Search"
                         size="middle"
                         value={searchValue}
                         onChange={(e) => onSearchChange(e.target.value)}
                         onSearch={(val) => onSearchChange(val)}
                     />
                 </Col>
-                <Row justify={'space-between'} style={{width: '100%'}}>
+                <Row justify={'space-between'} style={{width: '100%', marginTop: '7px'}}>
                     <Col>
                         <Title
                             style={{display: 'inline-block', color: '#645790', fontSize: '15px'}}
@@ -200,40 +178,54 @@ const CreateView = () => {
                     </Col>
                     <Col>
                         {showInspectionResult
-                        && <Title
-                            style={{display: 'inline-block', color: '#645790', fontSize: '15px'}}
-                            level={5}>
-                            <Tag color="green">passed [{passedNumber}] 😄</Tag>
-                            <Tag color="gold">warning [{warningNumber}] 😕</Tag>
-                            <Tag color="volcano">fail [{failNumber}] 💀</Tag>
-                        </Title>}
+                        &&
+                        <>
+                            <span style={{marginRight: '20px'}}>
+                                <Badge count={passedNumber}
+                                       style={{backgroundColor: '#f6ffed', color: '#389e0d', borderColor: '#b7eb8f'}}>
+                                    <Tag color="green">passed 😄</Tag>
+                                </Badge>
+                            </span>
+
+                            <span style={{marginRight: '20px'}}>
+                                <Badge count={warningNumber}
+                                       style={{backgroundColor: '#fffbe6', color: '#d48806', borderColor: '#ffe58f'}}>
+                                    <Tag color="gold">warning 😕</Tag>
+                                </Badge>
+                            </span>
+                            <span style={{marginRight: '20px'}}>
+                                <Badge count={failNumber}
+                                       style={{backgroundColor: '#fff2e8', color: '#d4380d', borderColor: '#ffbb96'}}>
+                                    <Tag color="volcano">fail 💀</Tag>
+                                </Badge>
+                            </span>
+                        </>
+                        }
                     </Col>
                 </Row>
             </Row>
             <Row gutter={[8, 8]} style={{width: '100%'}}>
                 <Collapse style={{width: '100%'}}>
                     <Panel header={
-                        <Text style={{fontWeight: 'bold', color: '#9E2A2B', fontSize: '17px'}} code={true}>ADVANCE
-                            SYSTEM FIX !</Text>
+                        <Text style={{fontWeight: 'bold', color: '#9E2A2B', fontSize: '17px'}} code={true}>
+                            ADVANCE SYSTEM FIX !
+                        </Text>
                     } key={'0'}>
                         <Row gutter={[8, 8]} justify={'space-between'}>
                             <Col>
-                                <Text code={true}
-                                      style={{fontWeight: 'bold', color: '#645790'}}>
-                                    select all failed
-                                    items</Text>
-                                <Switch
-                                    size={'small'}
-                                    style={{marginRight: '5px'}}
-                                    // checkedChildren={'disable'}
-                                    // unCheckedChildren={'select'}
-                                    defaultChecked={false}
-                                    onChange={bool => enforceFailedTests(bool)}
-                                />
+                                <Checkbox onChange={(e) => {
+                                    enforceFailedTests(e.target.checked)
+                                }}>
+                                    <Text
+                                        style={{fontWeight: 'bold', fontSize: '15px'}}
+                                        code={true}>
+                                        check all suspected items
+                                    </Text>
+                                </Checkbox>
                             </Col>
                             <Col>
                                 <Button size={'small'} danger={true} onClick={() => fixEnforcedItems()}>
-                                    Fix enforced items
+                                    Apply fix for all items
                                 </Button>
                             </Col>
                             <Col>
@@ -251,12 +243,13 @@ const CreateView = () => {
                 {filteredCustomItems.map((item, index) => {
                     return <Col key={index} span={filteredCustomItems.length === 1 ? 24 : 12}>
                         <CustomPolicyCard
-                            updateSinglePolicyActiveState={updateSinglePolicyActiveState}
                             idx={index}
                             policy={item}/>
                     </Col>
                 })}
-                {filteredCustomItems.length === 0 && <p>Could not find any matching audit policy</p>}
+                {filteredCustomItems.length === 0 &&
+                <Alert banner={true} style={{width: '100%'}} message={`No available search result for : ${searchValue}`}
+                       type="error"/>}
             </Row>
         </Spin>
     </>

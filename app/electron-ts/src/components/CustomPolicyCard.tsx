@@ -1,14 +1,26 @@
 import React, {useContext, useState} from 'react';
-import {Checkbox, Form, Input, Collapse, Typography, Button, Row, Col, Tag} from "antd";
+import {
+    Checkbox,
+    Form,
+    Input,
+    Collapse,
+    Typography,
+    Button,
+    Row,
+    Col,
+    Tag,
+} from "antd";
 import {
     AlertOutlined,
     CheckCircleOutlined,
     ExclamationCircleOutlined,
     FileAddOutlined,
     FileExcelOutlined,
+    MinusCircleOutlined,
+    PlusCircleOutlined,
     WarningOutlined
 } from "@ant-design/icons";
-import {singlePolicyFixAction, singlePolicyScanAction} from "../context/reducer";
+import {singlePolicyFixAction, singlePolicyScanAction, updateEditViewItemPolicies} from "../context/reducer";
 import {AppContext} from "../context/context";
 
 const {TextArea} = Input;
@@ -43,11 +55,21 @@ export const CustomPolicyCard = (props) => {
                 wrapperCol={{span: 24}}
                 labelAlign={'left'}
             >
-                <Row justify={'space-between'}>
-                    <Form.Item style={{marginBottom: '0px'}} label={'active'}>
-                        <Checkbox onChange={(e) => props.updateSinglePolicyActiveState(e.target.checked, props.idx)}
-                                  checked={policy.isActive}/>
-                    </Form.Item>
+                <Row justify={'space-between'} style={{marginBottom: '5px'}}>
+                    <Col>
+                        <Checkbox onChange={(e) => {
+                            dispatch(updateEditViewItemPolicies(policy, {isActive: e.target.checked}))
+                        }}
+                                  checked={policy.isActive}>
+                            <Text
+                                style={{fontWeight: 'bold', fontSize: '15px'}}
+                                code={true}>
+                                {policy.isActive
+                                    ? <> #{props.idx + 1} <MinusCircleOutlined/></>
+                                    : <> #{props.idx + 1} <PlusCircleOutlined/></>}
+                            </Text>
+                        </Checkbox>
+                    </Col>
                     <Col>
                         {policy.isEnforced !== undefined && policy.isEnforced &&
                         <Tag style={{cursor: 'pointer'}} color={'red'} onClick={() => applySinglePolicyFix()}>apply
@@ -71,7 +93,7 @@ export const CustomPolicyCard = (props) => {
                 <Collapse>
                     <Panel header={
                         <Text style={{color: '#645790', fontWeight: 'bold', fontSize: '15px'}}
-                              code={true}>[#{props.idx + 1} {policy.policy_type}] 📑
+                              code={true}>[ % {policy.policy_type} % ] 📑
                         </Text>
                     } key={0}>
                         <Collapse
