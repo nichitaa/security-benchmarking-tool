@@ -26,7 +26,7 @@ export const appReducer = (state: AppState, {type, payload}): AppState => {
             return {...state, parsedViewItem: payload}
         case ActionType.ToggleShowInspectionResult:
             return {...state, showInspectionResult: payload}
-        case ActionType.UpdateSytemScanStats:
+        case ActionType.UpdateSystemScanStats:
             return {
                 ...state,
                 inspectIsLoading: false,
@@ -43,6 +43,8 @@ export const appReducer = (state: AppState, {type, payload}): AppState => {
             return {...state, backupLoading: payload}
         case ActionType.ToggleBatchFixPolicyItemsLoading:
             return {...state, batchFixLoading: payload}
+        case ActionType.UpdateFilteredCustomItems:
+            return {...state, filteredCustomItems: payload}
         default:
             return state;
     }
@@ -50,11 +52,16 @@ export const appReducer = (state: AppState, {type, payload}): AppState => {
 
 export const updateEditViewItemPolicies = (policy: IAuditCustomItem, upd: IAuditCustomItem) => (dispatch, getState) => {
     const state = getState();
-    const {editViewItem} = state;
+    const {editViewItem, filteredCustomItems} = state;
     const {audit_custom_items} = editViewItem;
-    let temp: IAuditCustomItem[] = [];
-    temp = audit_custom_items.map(el => el.policy_reference === policy.policy_reference && el.policy_description === policy.policy_description ? {...el, ...upd} : el)
+    let temp = audit_custom_items.map(el => JSON.stringify(el) === JSON.stringify(policy) ? {...el, ...upd} : el);
+    let filteredTemp = filteredCustomItems.map(el => JSON.stringify(el) === JSON.stringify(policy) ? {...el, ...upd} : el);
     dispatch({type: ActionType.UpdateEditViewCustomItems, payload: temp})
+    dispatch({type: ActionType.UpdateFilteredCustomItems, payload: filteredTemp})
+}
+
+export const updateFilteredCustomItemsAction = (updated: IAuditCustomItem[]) => async (dispatch, getState) => {
+    dispatch({type: ActionType.UpdateFilteredCustomItems, payload: updated});
 }
 
 
@@ -74,15 +81,15 @@ export const singlePolicyScanAction = (policy, cb) => async (dispatch, getState)
     testCustomItem(policy)
         .then(res => {
             console.log('single scan response: ', res)
-            dispatch(updateEditViewItemPolicies(policy, {
-                passed: res.isSuccess,
-                warning: res.warning,
-                reason: res.reason,
-                isEnforced: !res.isSuccess || res.warning ? true : undefined
-            }))
             setTimeout(() => {
+                dispatch(updateEditViewItemPolicies(policy, {
+                    passed: res.isSuccess,
+                    warning: res.warning,
+                    reason: res.reason,
+                    isEnforced: !res.isSuccess || res.warning ? true : undefined
+                }))
                 cb()
-            }, 300)
+            }, 400)
         })
 }
 
@@ -92,7 +99,6 @@ export const batchPolicyItemsFixAction = () => async (dispatch, getState) => {
     const {editViewItem} = state;
     const {audit_custom_items} = editViewItem;
     let temp: IAuditCustomItem[] = [];
-    // temp = audit_custom_items.filter(el => el.isEnforced)
     audit_custom_items.forEach(el => {
         if (el.isEnforced) {
             temp.push({...el})
@@ -134,15 +140,13 @@ export const enforceAllPolicies = (bool) => async (dispatch, getState) => {
     const state = getState();
     const {editViewItem} = state;
     const {audit_custom_items} = editViewItem;
-    const temp: IAuditCustomItem[] = [];
     audit_custom_items.forEach(el => {
         if (el.passed === false || el.warning === true) {
-            temp.push({...el, isEnforced: bool})
+            dispatch(updateEditViewItemPolicies(el, {isEnforced: bool, isActive: bool}))
         } else {
-            temp.push({...el})
+            dispatch(updateEditViewItemPolicies(el, {isActive: !bool}))
         }
     })
-    dispatch({type: ActionType.UpdateEditViewCustomItems, payload: temp})
 }
 
 export const inspectEditViewItem = () => async (dispatch, getState) => {
@@ -159,7 +163,7 @@ export const inspectEditViewItem = () => async (dispatch, getState) => {
         const updateObj: IAuditCustomItem = {
             passed: res.isSuccess,
             warning: res.warning,
-            isEnforced: false,
+            isEnforced: !res.isSuccess || res.warning ? true : undefined,
             reason: res.reason
         }
         if (res.isSuccess && !res.warning) passedCounter++
@@ -171,7 +175,7 @@ export const inspectEditViewItem = () => async (dispatch, getState) => {
     }
     dispatch({type: ActionType.ToggleInspectIsLoading, payload: false});
     dispatch({
-        type: ActionType.UpdateSytemScanStats,
+        type: ActionType.UpdateSystemScanStats,
         payload: {fail: failedCounter, warn: warningCounter, pass: passedCounter}
     });
 }
