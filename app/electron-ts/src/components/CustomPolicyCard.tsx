@@ -46,11 +46,8 @@ export const CustomPolicyCard = (props) => {
 
     return (
         <div style={{
-            border: '1px solid #f0f0f0',
-            borderRadius: '6px',
-            padding: '10px',
-            background: 'rgba(0, 0, 0, 0.07)'
-        }}>
+
+        }} className={'singleItem'}>
             <Form
                 wrapperCol={{span: 24}}
                 labelAlign={'left'}

@@ -1,21 +1,19 @@
 import React, {useContext} from "react";
 import {
     Button,
+    Col,
     List,
-    message,
-    Popconfirm,
+    Row,
+    Tooltip,
     Typography,
     Upload
 } from "antd";
 import {
-    ArrowsAltOutlined,
+    CloudDownloadOutlined,
     DeleteOutlined,
-    DownloadOutlined,
-    EditOutlined,
-    FileSearchOutlined,
-    FileUnknownOutlined,
     FolderAddOutlined,
-    InfoCircleOutlined
+    FolderViewOutlined,
+    PartitionOutlined
 } from "@ant-design/icons";
 import {AppContext} from "../context/context";
 import {
@@ -102,7 +100,7 @@ export const DocumentList = () => {
             })
     };
 
-    const updateParsedItem = (item) => {
+    const updateParsedItem_ = (item) => {
         dispatch(updateParseViewItem(item))
         dispatch(toggleIsParsedView(true))
     }
@@ -137,57 +135,45 @@ export const DocumentList = () => {
             header={<p style={{marginBottom: 0}}>Audits Archive:</p>}
             bordered
             dataSource={files}
-            renderItem={(item) => <List.Item
-                style={{display: 'flex'}}>
-                <Popconfirm
-                    icon={<FileUnknownOutlined/>}
-                    title={'Actions'}
-                    onConfirm={() => {
-                        handleFileDownload(item.audit_file!.filename);
-                    }}
-                    onCancel={() => updateParsedItem(item)}
-                    okText={<>Download <DownloadOutlined/></>}
-                    cancelText={<>View <ArrowsAltOutlined/></>}
-                >
-                    <p
-                        style={{
-                            cursor: 'pointer',
-                            width: '90%',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            marginBottom: 0
-                        }}>{item.audit_file!.filename}</p>
-                </Popconfirm>
-
-                <Popconfirm
-                    icon={<InfoCircleOutlined/>}
-                    placement={'topRight'}
-                    title={'Delete file ? 👀'}
-                    onConfirm={() => {
-                        deleteFile(item.audit_file!.filename);
-                    }}
-                    onCancel={() => message.info(`😒`, 1)}
-                    okText="Confirm"
-                    cancelText="Cancel"
-                >
-                    <DeleteOutlined style={{color: 'red'}}/>
-                </Popconfirm>
-                <Popconfirm
-                    icon={<FileSearchOutlined/>}
-                    placement={'topRight'}
-                    title={'👀'}
-                    onConfirm={() => {
-                        dispatch(toggleIsEditView(true))
-                        dispatch(updateEditViewItem(item))
-                    }}
-                    onCancel={() => {
-                    }}
-                    okText={'Details'}
-                    cancelText={'Cancel'}
-                >
-                    <EditOutlined style={{color: '#33A2FF'}}/>
-                </Popconfirm>
-
+            renderItem={(item) => <List.Item>
+                <Row style={{width: '100%'}}>
+                    <Col span={12}>
+                        {item.audit_file!.filename}
+                    </Col>
+                    <Col span={12}>
+                        <Row justify={'end'} gutter={[3, 0]}>
+                            <Col>
+                                <Tooltip title={'delete'} placement={'left'}>
+                                    <Button
+                                        danger={true}
+                                        onClick={() => deleteFile(item.audit_file!.filename)}
+                                        icon={<DeleteOutlined/>}/>
+                                </Tooltip>
+                            </Col>
+                            <Col>
+                                <Tooltip title={'view json'}>
+                                    <Button onClick={() => updateParsedItem_(item)}
+                                            icon={<PartitionOutlined/>}
+                                    />
+                                </Tooltip>
+                            </Col>
+                            <Col>
+                                <Tooltip title={'download file'}>
+                                    <Button icon={<CloudDownloadOutlined/>}
+                                            onClick={() => handleFileDownload(item.audit_file!.filename)}/>
+                                </Tooltip>
+                            </Col>
+                            <Col>
+                                <Tooltip title={'details'}>
+                                    <Button onClick={() => {
+                                        dispatch(toggleIsEditView(true))
+                                        dispatch(updateEditViewItem(item))
+                                    }} icon={<FolderViewOutlined/>}/>
+                                </Tooltip>
+                            </Col>
+                        </Row>
+                    </Col>
+                </Row>
             </List.Item>}
         />
     </>
