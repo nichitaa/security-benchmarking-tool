@@ -21,7 +21,7 @@ Security benchmarking tool made with:
 
 ##### [Lab - 3 **Auditing**  a  Workstation](./tasks/CS_Lab3.pdf)
 
-**[Lab 4: Enforcing a Policy](./tasks/CS_Lab4.pdf)**
+#### [Lab 4: Enforcing a Policy](./tasks/CS_Lab4.pdf)
 
 ****
 
@@ -74,5 +74,4 @@ As a backup system, the application will export all current system registry key 
 ![recording4](https://github.com/nichitaa/CS-Labs/blob/main/recordings/lab4.gif)
 
 
-
-[Video]: https://github.com/nichitaa/CS-Labs/blob/main/recordings/screerecording.mp4
+#### [ Video ](./recordings/screerecording.mp4)
