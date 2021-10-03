@@ -61,15 +61,16 @@ class FileController {
         const fileRecord = new FileModel(doc);
         fileRecord.save(err => {
             if (err) res.send(500).json({isSuccess: false, error: err.message});
-            console.log("this: ", this);
+            console.log('this: ', this);
             return this.parseAuditFile(req, res, next, filename, fileRecord._id);
         });
     }
 
     async parseAuditFile(req, res, next, filename, fileId) {
-        console.log("reading file: ", filename);
+        console.log('reading file: ', filename);
         const filepath = path.join(__dirname, '/../uploads/' + filename);
         let content = fs.readFileSync(filepath, 'utf-8');
+        // this.parser(content);
         // remove tabs && new lines
         content = content.replace(/\s+/g, ' ');
         const audit_document_general_regex = {
@@ -185,7 +186,7 @@ class FileController {
                 policy_reg_option: /reg_option\s*:\s*(.*?) /g,
                 policy_key_item: /key_item\s*:\s*"?(.*?)" /g,
                 policy_reg_key: /reg_key\s*:\s*"(.*?)\" /g,
-                policy_reg_item: /reg_item\s*:\s*"(.*?)\" /g,
+                policy_reg_item: /reg_item\s*:\s*"(.*?)\" /g
             };
 
             // over custom items
@@ -203,7 +204,7 @@ class FileController {
                         // it depends from file to file, it can be the same key with double commas / single commas
                         // from regex with double comma (") substitute with single comma (')
                         let strReg = audit_custom_items_data_regex[key].toString();
-                        let singleCommaReg = strReg.split('"').join("'").slice(0, -2).substring(1);
+                        let singleCommaReg = strReg.split('"').join('\'').slice(0, -2).substring(1);
                         try {
                             let single_comma_regex = new RegExp(singleCommaReg, 'g');
                             let found = single_comma_regex.exec(custom_item);
@@ -275,6 +276,101 @@ class FileController {
             });
         });
     }
+
+    parser(content) {
+        // console.log(content);
+        const audit = [];
+        const stack = [];
+        let lines = content.split('\n');
+        lines = lines.map(l => l.trim());
+        // <author> : pasecinic_nichita
+        const openReg = /^[ \t]*<(item|custom_item|report|if|then|else|condition)[ \t>]/gm;
+        const closeReg = /^[ \t]*<\/(item|custom_item|report|if|then|else|condition)[ \t>]/gm;
+        const descReg = /^[ \t]*description[ \t]*:[ \t]*["\']/gm;
+
+
+        for (let i = 0; i < lines.length; i++) {
+            const l = lines[i];
+
+            if (l.match(openReg) !== null) {
+                let matches, output = [];
+                while (matches = openReg.exec(l)) {
+                    output.push(matches[1]);
+                }
+                audit.push({line: i + 1, key: output[0]});
+                stack.push(output[0]);
+            } else if (l.match(closeReg) !== null) {
+                let matches, output = [];
+                while (matches = closeReg.exec(l)) {
+                    output.push(matches[1]);
+                }
+                console.log('output close: ', output[0]);
+                console.log('output open: ', stack[stack.length - 1]);
+                if (stack.length === 0) {
+                    console.log('stack len is 0');
+                } else if (output[0] === stack[stack.length - 1]) {
+                    // match closing tag
+                    audit.push({lineEnd: i + 1, key: output[0]});
+                    stack.pop();
+                } else {
+                    console.log('unbalanced tag: ', stack[stack.length - 1], output[0], i);
+                }
+            } else if (l.match(descReg) !== null) {
+                let desc = l;
+                // audit.push({i: i + 1, stackLen: stack.length, desc})
+            }
+        }
+        console.log('audit: ', audit);
+
+
+        for (let i = 0; i < audit.length; i++) {
+            let el = audit[i];
+            if (el['line']) {
+                for (let j = i; j < audit.length; j++) {
+                    const elEnd = audit[j];
+
+                    if (elEnd['key'] === el['key'] && elEnd['lineEnd'] !== undefined && el['processed'] === undefined) {
+                        audit[i]['endLineMatch'] = elEnd['lineEnd'];
+                        audit[j]['processed'] = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        const filtered = audit.filter(el => el['line'] && el['endLineMatch']);
+
+        console.log('f', filtered);
+        const result = {};
+
+        recursive_(filtered, filtered[0], result, 0);
+        console.log('result: ', JSON.stringify(result, null, 2));
+
+        function recursive_(arr, current, result, idx) {
+            result['key'] = current['key'];
+
+            let strIdx = arr.findIndex(el => el['line'] > current['line']);
+            let endIdx = arr.findIndex(el => el['line'] > current['endLineMatch']);
+            endIdx === -1 ? endIdx = arr.length : endIdx = endIdx;
+            strIdx === -1 ? strIdx = arr.length : strIdx = strIdx;
+
+            if (strIdx !== endIdx) {
+                result['child'] = [];
+
+                for (let i = strIdx; i < endIdx; i++) {
+                    if (arr[i]['processed'] === undefined) {
+                        const newEl = {};
+                        result.child.push(newEl);
+                        arr[i]['processed'] = true;
+                        recursive_(arr, arr[i], newEl, i);
+                    }
+                }
+            } else if (strIdx === endIdx) {
+                return;
+            }
+        }
+    }
+
 }
 
 module.exports = FileController;
