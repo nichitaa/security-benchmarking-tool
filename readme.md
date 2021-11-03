@@ -21,7 +21,7 @@ Security benchmarking tool made with:
 
 ##### [Lab - 3 **Auditing**  a  Workstation](./tasks/CS_Lab3.pdf)
 
-#### [Lab 4: Enforcing a Policy](./tasks/CS_Lab4.pdf)
+#### [Lab 4 - 5: Enforcing multiple audit policies](./tasks/CS_Lab4.pdf)
 
 ****
 
@@ -67,7 +67,7 @@ Scan result are represented as icons, where green checkbox is a passed test, red
 
 ![recording2](https://github.com/nichitaa/CS-Labs/blob/main/recordings/gif3.gif)
 
-**[ lab 4 ]**
+**[ lab 4 - 5 ]**
 
 As a backup system, the application will export all current system registry key : HKLM, HKCU, HKCR, HKU and HKCC to a folder on desktop (ex: `regedit-backup1632761699`). In case something is wrong with the process, user can always rollback to the previous registry keys and import those files by opening them. The user can apply a single fix on just a single item from list and immediately see the scan result for it and once the toggle switch "select all failed items" is true, then the user can run a batch fix for all of the failed items, as well live results are immediately displayed 
 
