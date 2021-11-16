@@ -5,7 +5,7 @@ const path = require('path');
 const FileController = require('../controllers/FileController');
 
 const router = express.Router();
-const controller = new FileController()
+const controller = new FileController();
 
 const createUploadsFolder = () => {
     const dir = path.join(__dirname + '/../uploads/');
@@ -22,7 +22,7 @@ const storage = multer.diskStorage({
     }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({storage: storage});
 
 // upload file
 router.post('/', upload.single('file'), controller.uploadFile.bind(controller));

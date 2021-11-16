@@ -1,10 +1,10 @@
 import React from 'react';
-import thunk from "redux-thunk";
-import {createLogger} from "redux-logger";
-import {AppState, InitialAppState} from "./state";
+import thunk from 'redux-thunk';
+import {createLogger} from 'redux-logger';
+import {AppState, InitialAppState} from './state';
 
 
-const logger = createLogger({collapsed: true})
+const logger = createLogger({collapsed: true});
 
 const middlewares = [thunk, logger];
 
@@ -43,11 +43,11 @@ function createUseMiddlewareReducer(middlewares) {
             [reducer]
         );
         return [state, dispatch];
-    }
+    };
 }
 
 
 export const AppContext = React.createContext<{ state: AppState, dispatch }>({
     state: InitialAppState,
     dispatch: () => undefined
-})
+});

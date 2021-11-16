@@ -366,7 +366,7 @@ class FileController {
                     }
                 }
             } else if (strIdx === endIdx) {
-                return;
+
             }
         }
     }

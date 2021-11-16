@@ -19,12 +19,16 @@ const AuthenticatedView = () => {
     return (
         <>
             {/* MAIN VIEW */}
-            {(!isParseView && !isEditView) && <DocumentList/>}
+            {(!isParseView && !isEditView) &&
+            <>
+                <OAuthUserDetails/>
+                <DocumentList/>
+            </>
+            }
             {/* FILE PARSED VIEW MODE */}
             {isParseView && <ParsedView/>}
             {/* FILE EDIT MODE */}
             {isEditView && <CreateView/>}
-            <OAuthUserDetails/>
         </>
     );
 };

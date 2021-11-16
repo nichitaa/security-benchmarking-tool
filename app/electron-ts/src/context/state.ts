@@ -1,4 +1,4 @@
-import {IAuditCustomItem, IAuditDocument} from "../types";
+import {IAuditCustomItem, IAuditDocument} from '../types';
 
 export interface AppState {
     files: IAuditDocument[],
@@ -11,8 +11,8 @@ export interface AppState {
     showInspectionResult: boolean,
     inspectIsLoading: boolean,
     passedNumber: number | null,
-    warningNumber: number| null,
-    failNumber: number| null,
+    warningNumber: number | null,
+    failNumber: number | null,
     backupLoading: boolean,
     batchFixLoading: boolean,
     user: any | null;
@@ -34,4 +34,4 @@ export const InitialAppState: AppState = {
     batchFixLoading: false,
     filteredCustomItems: [],
     user: null
-}
+};

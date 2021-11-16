@@ -7,7 +7,7 @@ const router = express.Router();
  * General passport auth endpoints
  */
 router.get('/login/failed', (req, res, next) => {
-    res.redirect('http://localhost:3000')
+    res.redirect('http://localhost:3000');
 });
 router.get('/login/success', (req, res, next) => {
     if (req.user) {
