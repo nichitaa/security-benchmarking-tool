@@ -88,4 +88,4 @@ Added OAuth authentication, the providers are Google, Twitter and GitHub. The ra
 
 ![recording6](https://github.com/nichitaa/CS-Labs/blob/main/recordings/lab6.gif)
 
-#### [ ***Video - Full app demo!*** ](./recordings/fulldemo.mp4)
+#### [ ***Video - Full app demo!*** ] - comming soon
