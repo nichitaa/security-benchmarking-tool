@@ -1,15 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {
-    Checkbox,
-    Form,
-    Input,
-    Collapse,
-    Typography,
-    Button,
-    Row,
-    Col,
-    Tag,
-} from "antd";
+import {Button, Checkbox, Col, Collapse, Form, Input, Row, Tag, Typography} from 'antd';
 import {
     AlertOutlined,
     CheckCircleOutlined,
@@ -19,9 +9,9 @@ import {
     MinusCircleOutlined,
     PlusCircleOutlined,
     WarningOutlined
-} from "@ant-design/icons";
-import {singlePolicyFixAction, singlePolicyScanAction, updateEditViewItemPolicies} from "../context/reducer";
-import {AppContext} from "../context/context";
+} from '@ant-design/icons';
+import {singlePolicyFixAction, singlePolicyScanAction, updateEditViewItemPolicies} from '../context/reducer';
+import {AppContext} from '../context/context';
 
 const {TextArea} = Input;
 const {Panel} = Collapse;
@@ -29,28 +19,23 @@ const {Title, Text} = Typography;
 
 
 export const CustomPolicyCard = (props) => {
-    const {dispatch} = useContext(AppContext)
+    const {dispatch} = useContext(AppContext);
     const {policy} = props;
     const [loading, setLoading] = useState<null | boolean>(null);
 
     const singlePolicyScan = () => {
         setLoading(true);
         dispatch(singlePolicyScanAction(policy, () => setLoading(false)));
-    }
+    };
 
 
     const applySinglePolicyFix = () => {
         setLoading(true);
         dispatch(singlePolicyFixAction(policy, () => setLoading(false)));
-    }
+    };
 
     return (
-        <div style={{
-            border: '1px solid #f0f0f0',
-            borderRadius: '6px',
-            padding: '10px',
-            background: 'rgba(0, 0, 0, 0.07)'
-        }}>
+        <div style={{}} className={'singleItem'}>
             <Form
                 wrapperCol={{span: 24}}
                 labelAlign={'left'}
@@ -58,7 +43,7 @@ export const CustomPolicyCard = (props) => {
                 <Row justify={'space-between'} style={{marginBottom: '5px'}}>
                     <Col>
                         <Checkbox onChange={(e) => {
-                            dispatch(updateEditViewItemPolicies(policy, {isActive: e.target.checked}))
+                            dispatch(updateEditViewItemPolicies(policy, {isActive: e.target.checked}));
                         }}
                                   checked={policy.isActive}>
                             <Text
@@ -98,8 +83,8 @@ export const CustomPolicyCard = (props) => {
                     } key={0}>
                         <Collapse
                             expandIcon={({isActive}) => {
-                                if (isActive) return <FileExcelOutlined/>
-                                return <FileAddOutlined/>
+                                if (isActive) return <FileExcelOutlined/>;
+                                return <FileAddOutlined/>;
                             }}
                             style={{padding: '5px'}}
                             bordered={false}
@@ -178,5 +163,5 @@ export const CustomPolicyCard = (props) => {
                 </Collapse>
             </Form>
         </div>
-    )
-}
+    );
+};

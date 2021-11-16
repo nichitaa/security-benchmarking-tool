@@ -11,6 +11,7 @@
   "dependencies": {
     "codacy-coverage": "^3.4.0",
     "cookie-parser": "~1.4.3",
+    "cookie-session": "^1.4.0",
     "cors": "^2.8.5",
     "debug": "^2.6.9",
     "dotenv": "^8.2.0",
@@ -24,6 +25,12 @@
     "morgan": "~1.9.0",
     "multer": "^1.4.3",
     "nodemailer": "^6.3.1",
+    "passport": "^0.5.0",
+    "passport-github2": "^0.1.12",
+    "passport-google-oauth": "^2.0.0",
+    "passport-google-oauth2": "^0.2.0",
+    "passport-twitter": "^1.0.4",
+    "passport-twitter-oauth2": "^2.1.1",
     "regedit": "^5.0.0",
     "sudo-prompt": "^9.2.1",
     "template-file": "^5.1.0"

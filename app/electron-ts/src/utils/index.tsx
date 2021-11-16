@@ -1,7 +1,7 @@
-import {message} from "antd";
+import {message} from 'antd';
 
 export const objectClone = obj => {
-    return JSON.parse(JSON.stringify(obj))
+    return JSON.parse(JSON.stringify(obj));
 };
 
 export const showMessage = (type, msg, duration) => {
@@ -9,5 +9,5 @@ export const showMessage = (type, msg, duration) => {
         content: msg,
         duration: duration,
         style: {marginTop: '80vh'}
-    })
-}
+    });
+};

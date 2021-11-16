@@ -1,34 +1,30 @@
 import React, {useContext} from 'react';
-import {Button, Typography} from "antd";
-import ReactJson from "react-json-view";
-import {BackwardFilled} from "@ant-design/icons";
-import {toggleIsParsedView, updateParseViewItem} from "../context/reducer";
-import {AppContext} from "../context/context";
+import {Button, Row, Typography} from 'antd';
+import ReactJson from 'react-json-view';
+import {RollbackOutlined} from '@ant-design/icons';
+import {toggleIsParsedView, updateParseViewItem} from '../context/reducer';
+import {AppContext} from '../context/context';
 
 const {Title} = Typography;
 
 export const ParsedView = () => {
 
     const {state, dispatch} = useContext(AppContext);
-    const {parsedViewItem} = state
+    const {parsedViewItem} = state;
 
     const onBackClick = () => {
-        dispatch(toggleIsParsedView(false))
-        dispatch(updateParseViewItem(null))
-    }
+        dispatch(toggleIsParsedView(false));
+        dispatch(updateParseViewItem(null));
+    };
 
     return <>
-        <Title
-            style={{textAlign: 'center', color: '#555b6e'}}
-            level={5}>
+        <Row style={{marginBottom: '10px'}} justify={'space-between'}>
             <Button
-                type={'dashed'}
-                danger={true}
+                icon={<RollbackOutlined/>}
                 onClick={onBackClick}
-                style={{marginRight: '10px'}}>
-                <BackwardFilled/> back</Button>
-            {parsedViewItem.audit_display_name}
-        </Title>
+                style={{marginRight: '10px'}}/>
+            <Title level={4}>{parsedViewItem.audit_display_name}</Title>
+        </Row>
         <ReactJson
             displayObjectSize={true}
             enableClipboard={true}
@@ -39,6 +35,7 @@ export const ParsedView = () => {
             theme={'eighties'}
             displayDataTypes={false}
         />
+
     </>;
 
-}
+};

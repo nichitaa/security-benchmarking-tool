@@ -3,7 +3,7 @@ const path = require('path');
 const {app, BrowserWindow} = require('electron');
 const isDev = require('electron-is-dev');
 
-process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
+process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true';
 
 function createWindow() {
     // Create the browser window.
@@ -36,6 +36,7 @@ function createWindow() {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(createWindow);
+app.disableHardwareAcceleration();
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

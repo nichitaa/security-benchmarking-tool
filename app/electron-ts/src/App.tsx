@@ -1,28 +1,24 @@
 import {useContext, useEffect} from 'react';
+import AuthenticatedView from './components/AuthenticatedView';
+import {fetchUserAction} from './context/reducer';
+import OAuthView from './components/OAuthView';
+import {AppContext} from './context/context';
 import './App.css';
-import {ParsedView} from "./components/ParsedView";
-import {DocumentList} from "./components/DocumentList";
-import CreateView from "./components/CreateView";
-import {AppContext} from "./context/context";
-import {fetchData} from "./context/reducer";
 
 const App = () => {
 
-    const {state, dispatch} = useContext(AppContext)
-    const {isParseView, isEditView} = state;
+    const {state, dispatch} = useContext(AppContext);
+    const {user} = state;
 
     useEffect(() => {
-        dispatch(fetchData())
+        dispatch(fetchUserAction());
     }, [dispatch]);
 
     return (
         <div className="App">
-            {/* MAIN VIEW */}
-            {(!isParseView && !isEditView) && <DocumentList/>}
-            {/* FILE PARSED VIEW MODE */}
-            {isParseView && <ParsedView/>}
-            {/* FILE EDIT MODE */}
-            {isEditView && <CreateView/>}
+            {user === null
+                ? <OAuthView/>
+                : <AuthenticatedView/>}
         </div>
     );
 
