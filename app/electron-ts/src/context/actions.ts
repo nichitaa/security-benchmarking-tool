@@ -11,7 +11,9 @@ export enum ActionType {
     UpdateEditViewCustomItems = 'UpdateEditViewCustomItems',
     ToggleBackupLoading = 'ToggleBackupLoading',
     ToggleBatchFixPolicyItemsLoading = 'ToggleBatchFixPolicyItemsLoading',
-    UpdateFilteredCustomItems = 'UpdateFilteredCustomItems'
+    UpdateFilteredCustomItems = 'UpdateFilteredCustomItems',
+    FetchUser = 'FetchUser',
+    Logout = 'Logout'
 }
 
 export type AppActions = ActionType

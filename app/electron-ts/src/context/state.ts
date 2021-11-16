@@ -14,7 +14,8 @@ export interface AppState {
     warningNumber: number| null,
     failNumber: number| null,
     backupLoading: boolean,
-    batchFixLoading: boolean
+    batchFixLoading: boolean,
+    user: any | null;
 }
 
 export const InitialAppState: AppState = {
@@ -31,5 +32,6 @@ export const InitialAppState: AppState = {
     failNumber: 0,
     backupLoading: false,
     batchFixLoading: false,
-    filteredCustomItems: []
+    filteredCustomItems: [],
+    user: null
 }

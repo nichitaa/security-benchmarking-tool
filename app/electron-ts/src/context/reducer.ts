@@ -2,10 +2,10 @@ import {AppState} from "./state";
 import {
     backupRegistry,
     enforcePolicyItem,
-    fetchAuditDocuments,
+    fetchAuditDocuments, getUserData,
     policyBatchFix,
     testCustomItem
-} from "../services/api";
+} from '../services/api';
 import {ActionType} from "./actions";
 import {IAuditCustomItem} from "../types";
 import {showMessage} from "../utils";
@@ -45,9 +45,24 @@ export const appReducer = (state: AppState, {type, payload}): AppState => {
             return {...state, batchFixLoading: payload}
         case ActionType.UpdateFilteredCustomItems:
             return {...state, filteredCustomItems: payload}
+        case ActionType.FetchUser:
+            return {...state, user: payload}
+        case ActionType.Logout:
+            return {...state, user: null}
         default:
             return state;
     }
+}
+
+export const logoutAction = () => async (dispatch, getState) => {
+    window.open('http://localhost:8080/api/auth/logout', '_self');
+    dispatch({type: ActionType.Logout})
+}
+
+export const fetchUserAction = () => async (dispatch, getState) => {
+    const res = await getUserData();
+    if (res.user) dispatch({type: ActionType.FetchUser, payload: res.user})
+    else dispatch({type: ActionType.FetchUser, payload: null})
 }
 
 export const updateEditViewItemPolicies = (policy: IAuditCustomItem, upd: IAuditCustomItem) => (dispatch, getState) => {
