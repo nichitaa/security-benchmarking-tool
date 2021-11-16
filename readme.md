@@ -11,6 +11,7 @@ Security benchmarking tool made with:
 - Electron 
 - React - TS ( UI library - antd)
 - Express (multer for file storage)
+- PassportJS (for OAuth authentication - Google, GitHub, Twitter)
 - MongoDB (mongoose odm)
 
 -----------------------------------------
@@ -84,5 +85,6 @@ As a backup system, the application will export all current system registry key 
 
 Added OAuth authentication, the providers are Google, Twitter and GitHub. The raw `passportjs` provided user data can be directly view on main screen
 
+![recording6](https://github.com/nichitaa/CS-Labs/blob/main/recordings/lab6.gif)
 
-#### [ Video ](./recordings/screerecording.mp4)
+#### [ ***Video - Full app demo!*** ](./recordings/fulldemo.mp4)
