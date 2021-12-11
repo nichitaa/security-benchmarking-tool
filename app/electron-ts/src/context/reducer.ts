@@ -3,13 +3,14 @@ import {
     backupRegistry,
     enforcePolicyItem,
     fetchAuditDocuments,
-    getUserData,
-    policyBatchFix,
+    getUserData, isEmailVerified,
+    policyBatchFix, sendUserEmailVerification,
     testCustomItem
 } from '../services/api';
 import {ActionType} from './actions';
 import {IAuditCustomItem} from '../types';
 import {showMessage} from '../utils';
+import {message} from "antd";
 
 export const appReducer = (state: AppState, {type, payload}): AppState => {
     switch (type) {
@@ -50,10 +51,37 @@ export const appReducer = (state: AppState, {type, payload}): AppState => {
             return {...state, user: payload};
         case ActionType.Logout:
             return {...state, user: null};
+        case ActionType.ToggleIsEmailVerified:
+            return {...state, isEmailVerified: payload}
+        case ActionType.EmailVerificationLoading:
+            return {...state, emailVerificationLoading: payload}
         default:
             return state;
     }
 };
+
+export const sendVerificationMailAction = () => async (dispatch, getState) => {
+    const state = getState();
+    const email = state?.user?.emails[0]?.value
+    if (email) {
+        dispatch({type: ActionType.EmailVerificationLoading, payload: true})
+        const res = await sendUserEmailVerification(email)
+        if (res.isSuccess) message.success(res.message, 3)
+        if (!res.isSuccess) message.error(res.error, 2)
+        dispatch({type: ActionType.EmailVerificationLoading, payload: false})
+    }
+}
+
+export const checkIfVerifiedEmailAction = () => async (dispatch, getState) => {
+    const state = getState();
+    const email = state?.user?.emails[0]?.value
+    if (email) {
+        dispatch({type: ActionType.EmailVerificationLoading, payload: true})
+        const res = await isEmailVerified(email)
+        dispatch({type: ActionType.ToggleIsEmailVerified, payload: res.isVerified})
+        dispatch({type: ActionType.EmailVerificationLoading, payload: false})
+    }
+}
 
 export const logoutAction = () => async (dispatch, getState) => {
     window.open('http://localhost:8080/api/auth/logout', '_self');

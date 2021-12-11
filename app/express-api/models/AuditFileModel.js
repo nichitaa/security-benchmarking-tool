@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const File = new Schema({
-    filename: {type: String},
+    filename: {
+        iv: {type: String},
+        content: {type: String}
+    },
     file: {content: Buffer, content_type: String}
 }, {timestamps: true});
 const FileModel = mongoose.model('File', File);

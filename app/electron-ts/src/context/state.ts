@@ -16,6 +16,8 @@ export interface AppState {
     backupLoading: boolean,
     batchFixLoading: boolean,
     user: any | null;
+    isEmailVerified: boolean;
+    emailVerificationLoading: boolean;
 }
 
 export const InitialAppState: AppState = {
@@ -33,5 +35,7 @@ export const InitialAppState: AppState = {
     backupLoading: false,
     batchFixLoading: false,
     filteredCustomItems: [],
-    user: null
+    user: null,
+    isEmailVerified: false,
+    emailVerificationLoading: false
 };
