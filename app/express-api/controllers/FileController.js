@@ -57,7 +57,6 @@ class FileController {
         const fileRecord = new FileModel(doc);
         fileRecord.save(err => {
             if (err) res.send(500).json({isSuccess: false, error: err.message});
-            console.log('this: ', this);
             return this.parseAuditFile(req, res, next, filename, fileRecord._id);
         });
     }
@@ -244,6 +243,7 @@ class FileController {
                         ...file.audit_file, filename: decrypt(file.audit_file.filename)
                     }
                 }))
+                console.log('files: ', decrypted)
                 res.send({isSuccess: true, files: decrypted})
             })
             .catch(err => res.status(500).json({isSuccess: false, error: err.message}));
