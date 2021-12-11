@@ -13,7 +13,9 @@ export enum ActionType {
     ToggleBatchFixPolicyItemsLoading = 'ToggleBatchFixPolicyItemsLoading',
     UpdateFilteredCustomItems = 'UpdateFilteredCustomItems',
     FetchUser = 'FetchUser',
-    Logout = 'Logout'
+    Logout = 'Logout',
+    ToggleIsEmailVerified = 'ToggleIsEmailVerified',
+    EmailVerificationLoading = 'EmailVerificationLoading'
 }
 
 export type AppActions = ActionType

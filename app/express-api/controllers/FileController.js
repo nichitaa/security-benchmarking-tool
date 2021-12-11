@@ -2,6 +2,7 @@ const {AuditDocumentModel, FileModel} = require('../models/AuditFileModel');
 const fs = require('fs');
 const path = require('path');
 const {renderFile} = require('template-file');
+const {encrypt, decrypt} = require("../utils/crypto");
 
 class FileController {
 
@@ -20,8 +21,7 @@ class FileController {
                 fs.writeFile(path.join(__dirname, `../uploads/${filename}`), string, function (err) {
                     if (err) return res.status(500).json({isSuccess: false, error: err.message});
                     const doc = {
-                        filename: filename,
-                        file: {
+                        filename: encrypt(filename), file: {
                             content: fs.readFileSync(path.join(__dirname + '/../uploads/' + filename)),
                             content_type: 'audit'
                         }
@@ -30,9 +30,7 @@ class FileController {
                     fileRecord.save(err => {
                         if (err) res.status(500).json({isSuccess: false, error: err.message});
                         const auditDoc = {
-                            ...body,
-                            audit_file: fileRecord._id,
-                            audit_filename: filename
+                            ...body, audit_file: fileRecord._id, audit_filename: filename
                         };
                         const auditDocumentRecord = new AuditDocumentModel(auditDoc);
                         auditDocumentRecord.save(err => {
@@ -51,17 +49,14 @@ class FileController {
     async uploadFile(req, res, next) {
         const filename = req.file.originalname;
         const doc = {
-            filename: filename,
-            file: {
-                content: fs.readFileSync(path.join(__dirname + '/../uploads/' + filename)),
-                content_type: 'audit'
+            filename: encrypt(filename), file: {
+                content: fs.readFileSync(path.join(__dirname + '/../uploads/' + filename)), content_type: 'audit'
             }
         };
 
         const fileRecord = new FileModel(doc);
         fileRecord.save(err => {
             if (err) res.send(500).json({isSuccess: false, error: err.message});
-            console.log('this: ', this);
             return this.parseAuditFile(req, res, next, filename, fileRecord._id);
         });
     }
@@ -177,8 +172,7 @@ class FileController {
                 policy_query: /query\s*:\s*"(.*?)\"/g,
                 policy_reference: /reference\s*:\s*"(.*?)\"/g,
                 policy_see_also: /see_also\s*:\s*"(.*?)\"/g,
-                policy_value_type: /value_type\s*:\s*(.*?) /g,
-                // todo: fix
+                policy_value_type: /value_type\s*:\s*(.*?) /g, // todo: fix
                 policy_value_data: /value_data\s*:\s*"?([\s\S]*?)"? reg/g,
                 policy_Note: /\# Note\s*:\s*(.*?)value_data/,
                 policy_regex: /regex\s*:\s*"(.*?)\"/g,
@@ -229,8 +223,9 @@ class FileController {
                 audit_filename: filename
             });
             auditFileRecord.save(err => {
-                if (err) res.status(500).json({isSuccess: false, error: err.message});
-                else res.status(200).json({isSuccess: true});
+                if (err) res.status(500).json({
+                    isSuccess: false, error: err.message
+                }); else res.status(200).json({isSuccess: true});
             });
 
         } catch (e) {
@@ -238,12 +233,22 @@ class FileController {
         }
     }
 
-
     async getAllFiles(req, res, next) {
         AuditDocumentModel.find({}, '-_id')
             .populate('audit_file', '-_id')
             .exec()
-            .then(files => res.send({isSuccess: true, files}))
+            .then(files => {
+                const arr = []
+                for (let i = 0; i < files.length; i++) {
+                    const filename = decrypt(files[i].audit_file.filename)
+                    arr.push({
+                        ...files[i]._doc, audit_file: {
+                            ...files[i]._doc.audit_file._doc, filename: filename
+                        }
+                    })
+                }
+                res.send({isSuccess: true, files: arr})
+            })
             .catch(err => res.status(500).json({isSuccess: false, error: err.message}));
     }
 
@@ -270,7 +275,8 @@ class FileController {
         await fs.unlinkSync(filepath);
         AuditDocumentModel.findOneAndRemove({audit_filename: filename}, (err) => {
             if (err) res.status(500).json({isSuccess: false, error: err.message});
-            FileModel.findOneAndRemove({filename: filename}, (err) => {
+            const hash = encrypt(filename)
+            FileModel.findOneAndRemove({filename: hash}, (err) => {
                 if (err) res.status(500).json({isSuccess: false, error: err.message});
                 res.send({isSuccess: true, message: 'file was deleted'});
             });

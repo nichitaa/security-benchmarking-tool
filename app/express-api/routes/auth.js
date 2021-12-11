@@ -23,7 +23,7 @@ router.get('/logout', (req, res, next) => {
  * Google
  */
 router.get('google/logout');
-router.get('/google', passport.authenticate('google', {scope: ['profile']}));
+router.get('/google', passport.authenticate('google', {scope: ['profile', 'email']}));
 router.get('/google/callback', passport.authenticate('google', {
     successRedirect: 'http://localhost:3000',
     failureRedirect: '/login/failed'
@@ -33,7 +33,7 @@ router.get('/google/callback', passport.authenticate('google', {
  * Github
  */
 router.get('github/logout');
-router.get('/github', passport.authenticate('github', {scope: ['profile']}));
+router.get('/github', passport.authenticate('github', {scope: ['profile', 'email']}));
 router.get('/github/callback', passport.authenticate('github', {
     successRedirect: 'http://localhost:3000',
     failureRedirect: '/login/failed'
@@ -43,7 +43,7 @@ router.get('/github/callback', passport.authenticate('github', {
  * Twitter
  */
 router.get('twitter/logout');
-router.get('/twitter', passport.authenticate('twitter', {scope: ['profile']}));
+router.get('/twitter', passport.authenticate('twitter', {scope: ['profile', 'email']}));
 router.get('/twitter/callback', passport.authenticate('twitter', {
     successRedirect: 'http://localhost:3000',
     failureRedirect: '/login/failed'
