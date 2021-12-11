@@ -238,13 +238,16 @@ class FileController {
             .populate('audit_file', '-_id')
             .exec()
             .then(files => {
-                const decrypted = files.map(file => ({
-                    ...file, audit_file: {
-                        ...file.audit_file, filename: decrypt(file.audit_file.filename)
-                    }
-                }))
-                console.log('files: ', decrypted)
-                res.send({isSuccess: true, files: decrypted})
+                const arr = []
+                for (let i = 0; i < files.length; i++) {
+                    const filename = decrypt(files[i].audit_file.filename)
+                    arr.push({
+                        ...files[i]._doc, audit_file: {
+                            ...files[i]._doc.audit_file._doc, filename: filename
+                        }
+                    })
+                }
+                res.send({isSuccess: true, files: arr})
             })
             .catch(err => res.status(500).json({isSuccess: false, error: err.message}));
     }
