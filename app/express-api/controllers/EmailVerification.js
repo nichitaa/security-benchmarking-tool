@@ -2,6 +2,7 @@ const nodemailer = require('nodemailer')
 const dotenv = require('dotenv')
 const {UserEmailVerificationModel} = require("../models/UserEmailVerificationModel");
 const {encrypt} = require("../utils/crypto");
+const path = require("path");
 
 dotenv.config();
 
@@ -35,7 +36,7 @@ class EmailVerification {
             console.log('found: ', found)
             if (found.isVerified) return res.send({isSuccess: true, message: `email ${email} is already verified`})
             return res.send({
-                isSuccess: true, message: `the email with the verification link has already been send to ${email}`
+                isSuccess: true, message: `the email with the verification link has been already send to ${email}`
             })
         } else {
             // new email address
@@ -57,7 +58,10 @@ class EmailVerification {
                         `
                 }).then(info => {
                     console.log(info.messageId)
-                    res.send({isSuccess: true, message: 'check your email for verification'})
+                    res.send({
+                        isSuccess: true,
+                        message: `verification link was send to: ${email}, refresh the page after verification`
+                    })
                 }).catch(err => {
                     console.error(err.message)
                     res.send({isSuccess: false, err: err.message})
@@ -78,7 +82,7 @@ class EmailVerification {
         // successfully verified then
         found.isVerified = true
         await found.save();
-        return res.send({isSuccess: true, message: 'your email address has been successfully verified!'})
+        return res.sendFile(path.join(__dirname, '..', 'static', 'email-verification.html'))
     }
 
     generateToken(length) {

@@ -21,7 +21,7 @@ class FileController {
                 fs.writeFile(path.join(__dirname, `../uploads/${filename}`), string, function (err) {
                     if (err) return res.status(500).json({isSuccess: false, error: err.message});
                     const doc = {
-                        filename: filename, file: {
+                        filename: encrypt(filename), file: {
                             content: fs.readFileSync(path.join(__dirname + '/../uploads/' + filename)),
                             content_type: 'audit'
                         }
@@ -275,7 +275,8 @@ class FileController {
         await fs.unlinkSync(filepath);
         AuditDocumentModel.findOneAndRemove({audit_filename: filename}, (err) => {
             if (err) res.status(500).json({isSuccess: false, error: err.message});
-            FileModel.findOneAndRemove({filename: filename}, (err) => {
+            const hash = encrypt(filename)
+            FileModel.findOneAndRemove({filename: hash}, (err) => {
                 if (err) res.status(500).json({isSuccess: false, error: err.message});
                 res.send({isSuccess: true, message: 'file was deleted'});
             });
